@@ -1,6 +1,6 @@
 import os
 from database import get_supabase
-from connectors.mess.sync import sync_mess_menu
+from modules.menu.service import sync_menu
 
 supabase = get_supabase()
 if not supabase:
@@ -9,11 +9,11 @@ if not supabase:
 
 config = {
     "campus_id": "00000000-0000-0000-0000-000000000000",
-    "source_url": "default.json"
+    "source_url": None
 }
 
 try:
-    success = sync_mess_menu(config, supabase)
+    success = sync_menu(config, supabase)
     print("Success:", success)
 except Exception as e:
     import traceback
