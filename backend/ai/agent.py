@@ -1,67 +1,77 @@
-from langchain_groq import ChatGroq
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import StrOutputParser
 import os
 from datetime import date
 
-from database import get_supabase
+from modules.menu.service import DEFAULT_CAMPUS_ID, format_menu_for_assistant
 
-def get_meals_for_date(target_date: str) -> str:
-    """Useful to get the food or mess menu for a specific date."""
-    supabase = get_supabase()
-    if not supabase:
-        return "Database is not connected."
-        
-    campus_id = "00000000-0000-0000-0000-000000000000"
-    
-    response = supabase.table("meals").select("meal_type, items").eq("campus_id", campus_id).eq("date", target_date).execute()
-    
-    if not response.data:
-        return f"No menu found for {target_date}."
-        
-    result = []
-    for row in response.data:
-        items = ", ".join(row['items'])
-        result.append(f"{row['meal_type'].capitalize()}: {items}")
-        
-    return "\n".join(result)
+try:
+    from langchain_core.output_parsers import StrOutputParser
+    from langchain_core.prompts import ChatPromptTemplate
+    from langchain_groq import ChatGroq
+except ImportError:
+    ChatGroq = None
+    ChatPromptTemplate = None
+    StrOutputParser = None
 
-def chat_with_agent(message: str) -> str:
+
+MENU_KEYWORDS = {"lunch", "dinner", "breakfast", "menu", "food", "eat", "dish"}
+
+
+def _fallback_response(message: str, menu_context: str) -> str:
+    msg_lower = message.lower()
+    if any(keyword in msg_lower for keyword in MENU_KEYWORDS):
+        return menu_context
+    return (
+        "I can help with campus updates, calendar context, and module data. "
+        "The LangChain Groq runtime is not configured yet, so I am returning "
+        "deterministic module responses for now."
+    )
+
+
+def chat_with_agent(
+    message: str,
+    campus_id: str = DEFAULT_CAMPUS_ID,
+    role: str = "student",
+) -> str:
     """
-    Hackathon-optimized intelligent routing. 
-    Instead of using brittle Agent loops that often get stuck with smaller models, 
-    we use a stable LangChain Expression Language (LCEL) chain.
+    Hackathon-stable LCEL routing.
+    Each module exposes plain data functions; the chain only formats that data.
     """
-    if not os.environ.get("GROQ_API_KEY"):
-        return "GROQ API Key is not set."
-        
+    current_date = date.today().isoformat()
+    menu_context = format_menu_for_assistant(campus_id, current_date)
+    msg_lower = message.lower()
+
+    if not os.environ.get("GROQ_API_KEY") or not ChatGroq:
+        return _fallback_response(message, menu_context)
+
     try:
         llm = ChatGroq(temperature=0, model_name="llama-3.1-8b-instant")
-        msg_lower = message.lower()
-        current_date = date.today().isoformat()
-        
-        # Intent checking
-        if any(keyword in msg_lower for keyword in ["lunch", "dinner", "breakfast", "menu", "food", "eat"]):
-            # 1. Fetch data directly
-            raw_menu = get_meals_for_date(current_date)
-            
-            # 2. Use LangChain to format it beautifully
+        if any(keyword in msg_lower for keyword in MENU_KEYWORDS):
             prompt = ChatPromptTemplate.from_messages([
-                ("system", "You are the Campus Copilot. Use the raw menu data provided below to answer the user's question in a friendly, conversational tone. Do not output JSON. Just tell them what they want to know based on the menu.\n\nRaw Menu Data:\n{menu_data}"),
-                ("human", "{input}")
-            ])
-            
-            chain = prompt | llm | StrOutputParser()
-            return chain.invoke({"menu_data": raw_menu, "input": message})
-            
-        else:
-            # General casual chat
-            prompt = ChatPromptTemplate.from_messages([
-                ("system", "You are the Campus Copilot. Help the student with their campus life in a friendly way."),
+                (
+                    "system",
+                    "You are CampusBuddy, a campus assistant. The user's role is {role}. "
+                    "Answer only from this Menu module data. Do not invent unavailable dishes.\n\n"
+                    "{menu_context}",
+                ),
                 ("human", "{input}")
             ])
             chain = prompt | llm | StrOutputParser()
-            return chain.invoke({"input": message})
-            
+            return chain.invoke({
+                "role": role,
+                "menu_context": menu_context,
+                "input": message,
+            })
+
+        prompt = ChatPromptTemplate.from_messages([
+            (
+                "system",
+                "You are CampusBuddy, a concise campus hub assistant. "
+                "Explain what the hub can do and ask which module the user wants.",
+            ),
+            ("human", "{input}")
+        ])
+        chain = prompt | llm | StrOutputParser()
+        return chain.invoke({"input": message})
+
     except Exception as e:
         return f"Error: {str(e)}"

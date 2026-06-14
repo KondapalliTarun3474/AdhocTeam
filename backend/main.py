@@ -1,11 +1,15 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from database import get_supabase
-from connectors.mess.sync import sync_mess_menu
-from ai.agent import chat_with_agent
 
-app = FastAPI(title="Campus Copilot API")
+from ai.agent import chat_with_agent
+from core.module_registry import discover_modules
+from core.router import router as rbac_router
+from modules.hub.router import router as hub_router
+from modules.menu.service import DEFAULT_CAMPUS_ID, get_menu_for_date
+
+
+app = FastAPI(title="CampusBuddy API")
 
 app.add_middleware(
     CORSMiddleware,
@@ -14,42 +18,38 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(hub_router)
+app.include_router(rbac_router)
+
+for campus_module in discover_modules():
+    if campus_module.router:
+        app.include_router(campus_module.router)
+
 @app.get("/")
 def read_root():
-    return {"message": "Campus Copilot API running"}
-
-@app.post("/api/admin/sync/mess")
-def trigger_mess_sync(campus_id: str):
-    supabase = get_supabase()
-    if not supabase:
-        raise HTTPException(status_code=500, detail="Supabase not configured")
-        
-    config = {
-        "campus_id": campus_id,
-        "source_url": "default.json"
+    return {
+        "message": "CampusBuddy API running",
+        "modules": ["hub", "rbac"] + [module.key for module in discover_modules()],
     }
-    
-    try:
-        success = sync_mess_menu(config, supabase)
-        if success:
-            return {"status": "success", "message": "Synced mess menu successfully"}
-        return {"status": "error", "message": "Failed to sync all meals"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
+
+# Legacy alias while clients move to /api/modules/menu.
 @app.get("/api/meals")
 def get_meals(campus_id: str, date: str):
-    supabase = get_supabase()
-    if not supabase:
-        raise HTTPException(status_code=500, detail="Supabase not configured")
-        
-    response = supabase.table("meals").select("*").eq("campus_id", campus_id).eq("date", date).execute()
-    return {"data": response.data}
+    menu = get_menu_for_date(campus_id=campus_id, target_date=date)
+    return {"data": menu.dict()}
 
 class ChatRequest(BaseModel):
     message: str
+    campus_id: str = DEFAULT_CAMPUS_ID
+    user_id: str = "demo-student"
+    role: str = "student"
 
 @app.post("/api/chat")
 def chat(request: ChatRequest):
-    response = chat_with_agent(request.message)
+    response = chat_with_agent(
+        request.message,
+        campus_id=request.campus_id,
+        role=request.role,
+    )
     return {"reply": response}

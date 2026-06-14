@@ -3,7 +3,7 @@ uvicorn[standard]
 pydantic
 supabase
 langchain
-langchain-openai
+langchain-groq
 python-dotenv
 apscheduler
 requests

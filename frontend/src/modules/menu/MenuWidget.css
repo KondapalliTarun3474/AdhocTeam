@@ -1,0 +1,146 @@
+.menu-panel {
+  background: var(--cb-white);
+  border: 1px solid var(--cb-border);
+  border-radius: 8px;
+  box-shadow: var(--cb-shadow);
+  min-width: 0;
+  padding: 20px;
+}
+
+.menu-header {
+  align-items: flex-start;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.menu-header span {
+  color: var(--cb-cyan);
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 900;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.menu-header h2 {
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+.menu-header strong {
+  background: var(--cb-callout);
+  border-radius: 999px;
+  color: var(--cb-blue);
+  font-size: 0.8rem;
+  padding: 7px 10px;
+}
+
+.menu-meal-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.menu-meal-card {
+  border: 1px solid var(--cb-border);
+  border-radius: 8px;
+  min-width: 0;
+  padding: 14px;
+}
+
+.menu-meal-card h3 {
+  color: var(--cb-orange);
+  font-size: 0.95rem;
+  margin: 0 0 10px;
+  text-transform: capitalize;
+}
+
+.menu-meal-card ul {
+  display: grid;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.menu-meal-card li {
+  color: var(--cb-ink);
+  line-height: 1.35;
+}
+
+.menu-action {
+  background: var(--cb-paper);
+  border: 1px solid var(--cb-border);
+  border-radius: 8px;
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 16px;
+}
+
+.menu-action h3 {
+  font-size: 1rem;
+  margin: 0 0 4px;
+}
+
+.menu-action p {
+  color: var(--cb-muted);
+  margin: 0;
+}
+
+.menu-action label {
+  color: var(--cb-ink);
+  display: grid;
+  font-size: 0.85rem;
+  font-weight: 800;
+  gap: 6px;
+}
+
+.menu-action select,
+.menu-action textarea {
+  background: var(--cb-white);
+  border: 1px solid var(--cb-border);
+  border-radius: 6px;
+  color: var(--cb-ink);
+  padding: 10px 12px;
+  resize: vertical;
+  width: 100%;
+}
+
+.menu-action button {
+  background: var(--cb-blue);
+  border-radius: 6px;
+  color: var(--cb-white);
+  cursor: pointer;
+  font-weight: 900;
+  min-height: 42px;
+  padding: 10px 14px;
+}
+
+.menu-action.manager button {
+  background: var(--cb-orange);
+}
+
+.menu-admin-note {
+  background: var(--cb-callout);
+  border-left: 3px solid var(--cb-blue);
+  border-radius: 8px;
+  color: var(--cb-ink);
+  font-weight: 700;
+  margin-top: 16px;
+  padding: 12px;
+}
+
+.menu-status {
+  color: var(--cb-blue);
+  font-weight: 800;
+  margin: 14px 0 0;
+}
+
+@media (max-width: 780px) {
+  .menu-meal-grid {
+    grid-template-columns: 1fr;
+  }
+}

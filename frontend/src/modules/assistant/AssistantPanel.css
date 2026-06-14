@@ -1,0 +1,86 @@
+.assistant-panel {
+  background: var(--cb-ink);
+  border: 1px solid rgba(37, 47, 59, 0.18);
+  border-radius: 8px;
+  box-shadow: var(--cb-shadow);
+  color: var(--cb-white);
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  min-width: 0;
+  padding: 20px;
+}
+
+.assistant-header span {
+  color: var(--cb-cyan);
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 900;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.assistant-header h2 {
+  margin: 0 0 16px;
+}
+
+.assistant-messages {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 430px;
+  min-height: 260px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.assistant-message {
+  border-radius: 8px;
+  line-height: 1.45;
+  max-width: 92%;
+  padding: 11px 12px;
+  white-space: pre-wrap;
+}
+
+.assistant-message.assistant {
+  align-self: flex-start;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.assistant-message.user {
+  align-self: flex-end;
+  background: var(--cb-orange);
+  color: var(--cb-white);
+}
+
+.assistant-form {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 1fr auto;
+  margin-top: 16px;
+}
+
+.assistant-form input {
+  background: var(--cb-white);
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--cb-ink);
+  min-width: 0;
+  padding: 11px 12px;
+}
+
+.assistant-form button {
+  background: var(--cb-cyan);
+  border-radius: 6px;
+  color: var(--cb-ink);
+  cursor: pointer;
+  font-weight: 900;
+  padding: 0 16px;
+}
+
+.assistant-form button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
