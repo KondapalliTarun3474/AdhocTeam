@@ -44,6 +44,7 @@ backend/
     menu/
       default_menu.json
       fetcher.py
+      module.py
       router.py
       schemas.py
       service.py
@@ -72,7 +73,7 @@ frontend/src/
       AssistantPanel.css
 ```
 
-Rule: a module should not edit another module's folder. Shared contracts belong in `backend/core`, `frontend/src/api`, or `frontend/src/design`.
+Rule: a module should not edit another module's folder. Shared contracts belong in `backend/core`, `frontend/src/api`, `frontend/src/types`, or `frontend/src/design`.
 
 Frontend code is TypeScript-first. Shared API and hub contracts live in `frontend/src/types/campus.ts`. Module UI should use `.tsx`, module APIs should use `.ts`, and each module should export a typed `manifest.ts`.
 
@@ -149,6 +150,7 @@ It returns:
 - `calendar`
 - `modules`
 - `menu`
+- `module_data` for detailed non-core module payloads
 
 Future modules can add their own notifications and calendar events without changing the frontend shell structure.
 
@@ -182,3 +184,5 @@ To add LMS, ERP, Exam LMS, Campus Leave, or another app:
 7. Keep module-specific UI and CSS inside the module folder.
 
 This keeps development parallel-friendly and reduces merge conflicts.
+
+For detailed implementation rules, use `docs/module_development_guide.md` as the source of truth.

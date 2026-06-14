@@ -14,6 +14,40 @@ The frontend is now TypeScript-first because this project will have many indepen
 
 Keep the TypeScript simple. Type shared data contracts strongly, let local UI state infer where possible, and avoid building elaborate generic abstractions before the module flow is proven.
 
+## How To Describe The Next Module
+
+When a new module is requested, describe it with this shape. Short answers are fine, but these fields prevent architecture drift.
+
+```text
+Module name:
+Module key:
+Primary users/roles:
+What students can do:
+What staff/committee/professors can do:
+What admins can do:
+Data source for MVP:
+Pages/widgets needed now:
+Hub notifications/updates/calendar items:
+Assistant questions it should answer:
+Anything explicitly out of scope:
+```
+
+Example:
+
+```text
+Module name: Menu
+Module key: menu
+Primary users/roles: student, food_committee, admin
+What students can do: view meals, review dishes
+What food committee can do: upload and update meals
+What admins can do: assign roles, moderate all data
+Data source for MVP: static JSON
+Pages/widgets needed now: today's menu widget, review form, manager update form
+Hub notifications/updates/calendar items: lunch published, dinner updated
+Assistant questions it should answer: what's for lunch, what is for dinner
+Anything explicitly out of scope: payment, inventory
+```
+
 ## Why The Module Refactor Helps
 
 The repo is designed for parallel module development. Menu, LMS, ERP, Exam LMS, Campus Leave, and future apps should be built in their own folders.
@@ -55,7 +89,19 @@ backend/
   main.py
   requirements.txt
   schema.sql
+```
 
+Do not commit local environments:
+
+```text
+backend/venv/
+frontend/node_modules/
+frontend/dist/
+```
+
+These are ignored and should stay local.
+
+```text
 frontend/src/
   api/
     client.ts
@@ -164,6 +210,14 @@ MODULE = CampusModule(
 
 The hub provider must return JSON-serializable data. Do not return database client objects, Pydantic classes without converting them, or functions.
 
+Recommended backend ownership:
+
+- `schemas.py`: Pydantic request/response models only.
+- `service.py`: business logic, Supabase reads/writes, static JSON parsing.
+- `router.py`: FastAPI routes, validation, RBAC dependencies.
+- `module.py`: `CampusModule` metadata and optional hub provider.
+- `default_<module>.json`: optional MVP seed/mock data.
+
 ## Backend Router Pattern
 
 Use this route prefix:
@@ -189,6 +243,31 @@ Add new permissions in `backend/core/rbac.py`. Keep names predictable:
 - `<module_key>:review`
 - `<module_key>:approve`
 - `<module_key>:grade`
+
+For hackathon MVP, role is passed through the `X-User-Role` header. Do not build module-specific login/auth yet. Later, real auth should resolve user roles centrally and keep the same permission names.
+
+## Database Pattern
+
+For any persisted module data, prefer campus-scoped tables:
+
+```sql
+CREATE TABLE IF NOT EXISTS <module_table> (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    campus_id UUID NOT NULL,
+    ...
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+```
+
+Use composite unique constraints for rows that should be idempotently upserted:
+
+```sql
+UNIQUE(campus_id, date, item_key)
+```
+
+Do not key shared campus data by `user_id` unless the data is truly user-specific. Menus, events, exam schedules, and notices are usually campus-level. Reviews, submissions, leave requests, and personal preferences are user-level.
+
+For now, schema changes go in `backend/schema.sql`. Keep table names module-prefixed when there is a chance of collision, such as `lms_assignments`, `exam_lms_slots`, or `campus_leave_requests`.
 
 ## Frontend Module Contract
 
@@ -223,6 +302,16 @@ export default LmsWidget
 ```
 
 The hub discovers manifests through `frontend/src/modules/registry.ts`. Do not import a new module directly inside `HubDashboard.tsx`.
+
+Recommended frontend ownership:
+
+- `manifest.ts`: module metadata and widget registration.
+- `<ModuleWidget>.tsx`: dashboard-level module widget.
+- `<ModuleWidget>.css`: module-local styles using design tokens.
+- `api.ts`: optional module-local frontend API calls.
+- `types.ts`: optional module-local types that should not be global.
+
+Only promote types into `frontend/src/types/campus.ts` when multiple modules or the hub need them.
 
 ## Shared Frontend Types
 
@@ -268,6 +357,42 @@ type HubOverview = {
 
 For new modules, prefer putting detailed module-specific data under `module_data[module_key]`. Keep top-level fields only for established core modules.
 
+Example module contribution:
+
+```python
+def lms_hub_provider(campus_id, user_id, role, today):
+    return {
+        "notifications": [],
+        "updates": [],
+        "calendar": [],
+        "module_data": {
+            "lms": {
+                "pending_assignments": [],
+                "next_class": None,
+            }
+        }
+    }
+```
+
+Important: the current hub service merges `module_data` safely, but module-specific `notifications`, `updates`, and `calendar` merging should be added before multiple modules publish those lists dynamically. Until then, a module can expose detailed data under `module_data` and the hub can decide what to display.
+
+## Assistant Integration
+
+The assistant is intentionally simple right now:
+
+- `backend/ai/agent.py` routes by keyword.
+- Module services fetch data.
+- LangChain only formats the module data.
+- If `GROQ_API_KEY` is missing, deterministic fallback responses are used.
+
+When adding assistant support for a module:
+
+1. Add a small formatter in the module service, such as `format_lms_for_assistant`.
+2. Import that formatter in `backend/ai/agent.py`.
+3. Add a narrow keyword route.
+4. Keep the prompt grounded in raw module data.
+5. Do not let the chain directly query Supabase tables.
+
 ## Design Rules
 
 Use the screenshot-derived theme variables from `frontend/src/design/theme.css`:
@@ -291,7 +416,7 @@ Backend:
 
 ```bash
 cd backend
-python3 -m compileall .
+python3 -m compileall ai core modules main.py database.py test_agent.py test_sync.py
 uvicorn main:app --reload
 ```
 
@@ -306,6 +431,26 @@ npm run dev
 ```
 
 If `npm install` fails because of a network or registry policy, do not commit partial `node_modules`. Delete it and report the registry error.
+
+Project-local npm config lives in `frontend/.npmrc` so this repo can use public npm without changing global proxy settings. If a company proxy is active, run npm commands with proxy environment variables cleared for this project only.
+
+## Branch And Commit Workflow
+
+For parallel development:
+
+1. Create a branch named `<Name>-<module-key>` or `<Name>-<short-task>`.
+2. Keep changes scoped to the module folders whenever possible.
+3. Run backend and frontend checks.
+4. Commit source/config/docs only.
+5. Push the branch and open a PR.
+
+Do not commit:
+
+- `.env`
+- `backend/venv/`
+- `frontend/node_modules/`
+- `frontend/dist/`
+- Python `__pycache__/`
 
 ## Merge Conflict Rules
 
@@ -325,6 +470,8 @@ Normal module work should happen inside:
 
 RBAC changes are the main exception. If your module needs new permissions, edit `backend/core/rbac.py` with the smallest possible change.
 
+Shared frontend type changes are another exception. If your module needs a cross-module contract, edit `frontend/src/types/campus.ts`, but do not put module-only details there.
+
 ## Module Checklist
 
 Before handing off a module:
@@ -335,6 +482,7 @@ Before handing off a module:
 4. Protected backend routes use `require_permission`.
 5. Frontend uses `ModuleWidgetProps`.
 6. CSS uses `theme.css` variables.
-7. `python3 -m compileall backend` passes.
+7. `python3 -m compileall ai core modules main.py database.py test_agent.py test_sync.py` passes from `backend/`.
 8. `npm run typecheck` passes when dependencies are installed.
 9. No module-specific code was added to another module folder.
+10. The module can be disabled or ignored without breaking the hub.
