@@ -2,10 +2,16 @@ import type { ComponentType } from 'react'
 
 export type Role =
   | 'student'
-  | 'food_committee'
   | 'professor'
-  | 'teaching_assistant'
+  | 'staff'
   | 'admin'
+
+export type Designation =
+  | 'food_committee'
+  | 'teaching_assistant'
+  | 'warden'
+  | 'security'
+  | 'classroom_support'
 
 export type ModuleStatus = 'connected' | 'planned' | 'disabled'
 export type Priority = 'high' | 'normal' | 'low'
@@ -49,12 +55,14 @@ export interface ModuleSummary {
   summary: string
   available: boolean
   roles?: Role[]
+  designations?: Designation[]
 }
 
 export interface HubOverview {
   campus_id: string
   user_id: string
   role: Role
+  designations?: Designation[]
   date: string
   notifications: HubNotification[]
   updates: HubUpdate[]
@@ -86,7 +94,9 @@ export interface AssistantResponse {
 
 export interface ModuleWidgetProps {
   campusId: string
+  designations: Designation[]
   isLoading: boolean
+  openModule?: (moduleKey: ModuleKey) => void
   overview: HubOverview | null
   role: Role
   userId: string
@@ -98,5 +108,7 @@ export interface FrontendModuleManifest {
   summary: string
   status: ModuleStatus
   roles: Role[]
+  designations?: Designation[]
+  Page?: ComponentType<ModuleWidgetProps>
   Widget?: ComponentType<ModuleWidgetProps>
 }

@@ -1,0 +1,76 @@
+{
+  "week_start": "2025-08-04",
+  "imported_from": "IIITB-Menu.xlsx",
+  "days": [
+    {
+      "date": "2025-08-04",
+      "day_name": "Monday",
+      "meals": [
+        { "meal_type": "breakfast", "items": ["PODI MASALA DOSA", "SEMIYA UPMA", "SAMBAR", "Coconut chutney", "Boiled egg", "TEA, COFFEE, MILK,", "BREAD, JAM, BUTTER"] },
+        { "meal_type": "lunch", "items": ["Bhatura", "chole", "Aloo Methi", "Puliogare", "PLAIN RICE", "DAL TADKA", "Tomato RASAM", "Curd", "PASTA SALAD", "CHOCOLATE ICE CREAM"] },
+        { "meal_type": "snacks", "items": ["Kachori", "Green chutney", "TEA/COFFEE/MILK"] },
+        { "meal_type": "dinner", "items": ["PUDINA CHAPATI", "Gobhi 65", "VEG BIRIYANI", "PLAIN RICE", "Black Dal Tadka", "SAMBAR", "RAITA", "Green Salad", "Shahi Tukda", "Paneer Lababdar", "Chicken Lababdar"] }
+      ]
+    },
+    {
+      "date": "2025-08-05",
+      "day_name": "Tuesday",
+      "meals": [
+        { "meal_type": "breakfast", "items": ["Bedmi POORI", "Poha", "Aloo subzi", "COCONUT Chutney", "Cut Fruits", "TEA, COFFEE, MILK,", "BREAD, JAM, BUTTER"] },
+        { "meal_type": "lunch", "items": ["Chapati", "Dum aloo", "Rajma masala", "JEERA RICE", "PLAIN RICE", "Peanut gun powder with ghee", "Sambhar", "majjiga pulusu", "Tomato Green Salad", "PAYASAM"] },
+        { "meal_type": "snacks", "items": ["CHANNA USULLI ( BLACK & WHITE)", "TEA/COFFEE/MILK"] },
+        { "meal_type": "dinner", "items": ["CHAPATI", "Methi Malai Mattar", "Tawa Subzi", "Tomato Rice", "PLAIN RICE", "Arhar Dal", "Sambhar", "CURD", "PUNJABI SALAD", "Gulaab Jamun"] }
+      ]
+    },
+    {
+      "date": "2025-08-06",
+      "day_name": "Wednesday",
+      "meals": [
+        { "meal_type": "breakfast", "items": ["Gobi Paratha", "PONGAL", "Tomato Chutney", "CURD", "Egg Bhurji", "TEA, COFFEE, MILK,", "BREAD, JAM, BUTTER"] },
+        { "meal_type": "lunch", "items": ["JEERA CHAPATI", "Vankai Curry", "Chole masala dry", "CURD RICE", "PLAIN RICE", "GREEN MOONG DAL", "PEPPER RASAM", "lemonade with chia seeds", "green salad", "MOONG DAL HALWA"] },
+        { "meal_type": "snacks", "items": ["MASALA SWEET CORN", "TEA/COFFEE/MILK"] },
+        { "meal_type": "dinner", "items": ["Ajwain Chapati", "ALOO METHI", "BAGARA RICE", "PLAIN RICE", "DAL PANCHMEL", "Rasam", "raitha", "green salad", "Butterscotch Milkshake", "CHICKEN MASALA", "PANEER MASALA"] }
+      ]
+    },
+    {
+      "date": "2025-08-07",
+      "day_name": "Thursday",
+      "meals": [
+        { "meal_type": "breakfast", "items": ["MASALA UPMA", "ONION Tomato Utappam", "Sambhar", "Cocunut Chutney", "Papaya Cut Fruit", "TEA, COFFEE, MILK,", "BREAD, JAM, BUTTER"] },
+        { "meal_type": "lunch", "items": ["PALAK POORI", "ALOO BHAJJI (Bedmi puri style)", "CORIANDER CHUTNEY", "Lemon rice without onion", "PLAIN RICE", "LASOONI DAL TADKA(Thick)", "Rasam", "Buttermilk", "CUCUMBER SALAD", "Kalakand"] },
+        { "meal_type": "snacks", "items": ["Samosa Chat", "Green Chutney and Imlie chutney", "TEA/COFFEE/MILK"] },
+        { "meal_type": "dinner", "items": ["MASALA CHAPATI", "Malai kofta", "Aloo Pieces small fry", "Vangi bath", "PLAIN RICE", "Methi Pappu", "Pumpkin Sambhar", "Curd", "Red sauce PASTA Salad", "BOONDI LADDU"] }
+      ]
+    },
+    {
+      "date": "2025-08-08",
+      "day_name": "Friday",
+      "meals": [
+        { "meal_type": "breakfast", "items": ["Aloo Onion Paratha", "SEMIYABATH", "Curd", "Peanut Chutney", "Banana", "TEA, COFFEE, MILK,", "BREAD, JAM, BUTTER"] },
+        { "meal_type": "lunch", "items": ["CHAPATHI", "Egg curry/ Soya Capsicum curry", "Bhindi Kurkure", "Bisi bele bath", "PLAIN RICE", "Dal Panchmel", "TOMATO RASAM", "Curd", "GREEN SALAD", "Strawberry Milkshake"] },
+        { "meal_type": "snacks", "items": ["PAV BHAJI", "TEA/COFFEE/MILK"] },
+        { "meal_type": "dinner", "items": ["Tawa paratha", "TAWA SUBZI", "Veg Biryani", "PLAIN RICE", "Moong Daal", "Garlic Rasam", "Curd", "Jalebi with Rabdi", "Paneer Lababdar", "Chicken Lababdar"] }
+      ]
+    },
+    {
+      "date": "2025-08-09",
+      "day_name": "Saturday",
+      "meals": [
+        { "meal_type": "breakfast", "items": ["ADAI DOSA", "Aloo Sandwich", "TOMATO CHUTNEY", "Coconut Chutney", "Fruits", "TEA, COFFEE, MILK,", "BREAD, JAM, BUTTER"] },
+        { "meal_type": "lunch", "items": ["AJWANI CHAPATI", "Gatta ki subji", "Dondakaya Semi Dry", "Tomato rice", "PLAIN RICE", "Arhar dal", "Pepper Rasam", "curd", "ALOO CHANA CHAT", "Hot Chocolate"] },
+        { "meal_type": "snacks", "items": ["Masala Idly", "GREEN CHUTNEY", "TEA/COFFEE/MILK"] },
+        { "meal_type": "dinner", "items": ["ajwain chapati", "French Fries", "Subz Lahori", "Veg Pulao", "Plain Rice", "Lasooni Dal Tadka", "Rasam", "Curd", "badhusha"] }
+      ]
+    },
+    {
+      "date": "2025-08-10",
+      "day_name": "Sunday",
+      "meals": [
+        { "meal_type": "breakfast", "items": ["KHARA BATH", "KESARI BATH without clove", "Sambar", "PEANUT CHUTNEY and GUN POWDER", "FRUITS", "TEA, COFFEE, MILK,", "BREAD, JAM, BUTTER"] },
+        { "meal_type": "lunch", "items": ["CHAPATHI", "BHINDI PULUSU", "ALOO MUTTER DRY", "kashmiri pulav", "PLAIN RICE", "Masoor Dal", "Garlic rasam", "Sweet Lassi", "GREEN SALAD", "Kala Jamun"] },
+        { "meal_type": "snacks", "items": ["BHEL POORI", "TEA/COFFEE/MILK"] },
+        { "meal_type": "dinner", "items": ["METHI CHAPATHI", "SUBZI HANDI", "PLAIN RICE", "DAL TADKA", "SALAN", "Raitha", "GREEN SALAD", "Rasgulla", "PANEER BIRYANI", "hyderabadi style chicken biryani"] }
+      ]
+    }
+  ]
+}
