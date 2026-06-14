@@ -10,7 +10,9 @@ CampusBuddy is the central hub for student life. The first screen is a dashboard
 - Connected module widgets
 - Assistant chat
 
-Individual campus apps are developed as independent modules: Menu, LMS, ERP, Exam LMS, Campus Leave, and future apps. Each module owns its backend routes, schemas, services, and frontend UI.
+Individual campus apps are developed as independent modules: Foode/Menu, Campus Room Tracker, Leave Application, LMS, ERP, Exam LMS, and future apps. Each module owns its backend routes, schemas, services, and frontend UI.
+
+The hub is a glance surface. It should show summaries only, such as the next meal from Foode. Full module workflows open as separate pages from the left navigation or from a glance action button.
 
 ## 2. Design System
 
@@ -42,8 +44,19 @@ backend/
       router.py
       service.py
     menu/
+      default_weekly_menu.json
       default_menu.json
       fetcher.py
+      module.py
+      router.py
+      schemas.py
+      service.py
+    campus_rooms/
+      module.py
+      router.py
+      schemas.py
+      service.py
+    campus_leave/
       module.py
       router.py
       schemas.py
@@ -66,8 +79,29 @@ frontend/src/
       HubDashboard.css
     menu/
       manifest.ts
+      MenuGlance.tsx
+      MenuGlance.css
       MenuWidget.tsx
       MenuWidget.css
+      api.ts
+      defaultMenu.ts
+      types.ts
+    campus_rooms/
+      CampusRoomsGlance.tsx
+      CampusRoomsPage.tsx
+      CampusRooms.css
+      api.ts
+      defaultRooms.ts
+      manifest.ts
+      types.ts
+    campus_leave/
+      CampusLeaveGlance.tsx
+      CampusLeavePage.tsx
+      CampusLeave.css
+      api.ts
+      defaultLeave.ts
+      manifest.ts
+      types.ts
     assistant/
       AssistantPanel.tsx
       AssistantPanel.css
@@ -81,21 +115,51 @@ Frontend code is TypeScript-first. Shared API and hub contracts live in `fronten
 
 RBAC is centralized in `backend/core/rbac.py`.
 
-Current roles:
+Current global roles:
 
 - `student`
-- `food_committee`
 - `professor`
-- `teaching_assistant`
+- `staff`
 - `admin`
+
+Current designations:
+
+- `food_committee`
+- `teaching_assistant`
+- `warden`
+- `security`
+- `classroom_support`
+
+Food Committee and TA are student designations, Warden is a professor designation, and Security/Classroom Support are staff designations. A user's effective permissions are:
+
+```text
+global role permissions + designation permissions
+```
 
 Current Menu permissions:
 
-- Students: view menu, review dishes
-- Food committee: view menu, manage menu
-- Admin: assign roles, manage menu, view all module controls
+- Students: view menu, rate menu items, request sick meals, send feedback
+- Food Committee designation: manage weekly menus, import Excel sheets, view ratings, view sick meals, view feedback
+- Admin: configure module source, assign roles/designations, manage menu, view all module controls
 
-The backend currently uses `X-User-Role` as a simple hackathon header. Real auth can replace this later without forcing modules to rewrite their permission checks.
+The backend currently uses `X-User-Role` and `X-User-Designations` as simple hackathon headers. Real auth can replace these later without forcing modules to rewrite their permission checks.
+
+Header examples:
+
+```text
+X-User-Role: student
+X-User-Designations: food_committee
+```
+
+```text
+X-User-Role: staff
+X-User-Designations: security
+```
+
+```text
+X-User-Role: admin
+X-User-Designations:
+```
 
 ## 5. Module API Pattern
 
@@ -127,9 +191,49 @@ Example paths for Menu:
 
 - `GET /api/modules/menu`
 - `GET /api/modules/menu/today`
+- `GET /api/modules/menu/workspace`
+- `GET /api/modules/menu/config`
+- `PUT /api/modules/menu/config`
+- `GET /api/modules/menu/week`
+- `PUT /api/modules/menu/week`
+- `POST /api/modules/menu/import`
 - `POST /api/modules/menu/sync`
 - `PUT /api/modules/menu`
+- `POST /api/modules/menu/ratings`
+- `POST /api/modules/menu/sick-meals`
+- `POST /api/modules/menu/feedback`
 - `POST /api/modules/menu/reviews`
+
+Menu module setup supports:
+
+- `external_website`: campus admins add an existing URL such as `foodcommittee.iiitb.ac.in`.
+- `default_app`: campus admins use the built-in CampusBuddy Menu app.
+
+The default app includes weekly menu display, per-item ratings, sick meal requests, feedback, Food Committee manual menu edits, and raw `.xlsx` menu import.
+
+Campus Room Tracker endpoints:
+
+- `GET /api/modules/campus-rooms/workspace`
+- `GET /api/modules/campus-rooms/config`
+- `PUT /api/modules/campus-rooms/config`
+- `GET /api/modules/campus-rooms/rooms`
+- `GET /api/modules/campus-rooms/courses`
+- `GET /api/modules/campus-rooms/bookings`
+- `POST /api/modules/campus-rooms/bookings`
+- `PATCH /api/modules/campus-rooms/bookings/{booking_id}`
+
+Leave Application endpoints:
+
+- `GET /api/modules/campus-leave/workspace`
+- `GET /api/modules/campus-leave/config`
+- `PUT /api/modules/campus-leave/config`
+- `GET /api/modules/campus-leave/applications`
+- `POST /api/modules/campus-leave/applications`
+- `PATCH /api/modules/campus-leave/applications/{application_id}`
+- `GET /api/modules/campus-leave/students`
+- `PATCH /api/modules/campus-leave/curfew`
+
+Both campus modules support `external_website` with `https://campus.iiitb.net` and `default_app` with the built-in CampusBuddy experience.
 
 ## 6. Hub Integration Pattern
 
@@ -138,6 +242,13 @@ The hub aggregates summaries, not full module logic.
 Each backend module exposes `module.py`. The backend discovers these files through `backend/core/module_registry.py`, so new module routers do not require direct imports in `backend/main.py`.
 
 Each frontend module exposes `manifest.ts`. The frontend discovers manifests through `frontend/src/modules/registry.ts`, so the hub can render connected widgets without importing every module by hand.
+
+Frontend manifests may expose:
+
+- `Widget`: dashboard glance.
+- `Page`: full module page.
+
+Keep forms, uploads, detailed tables, and module-specific tabs in `Page`. Keep `Widget` small.
 
 The current hub endpoint is:
 
@@ -152,7 +263,7 @@ It returns:
 - `menu`
 - `module_data` for detailed non-core module payloads
 
-Future modules can add their own notifications and calendar events without changing the frontend shell structure.
+Future modules can add their own notifications and calendar events without changing the frontend shell structure. Current connected examples are Campus Room Tracker calendar rows and Leave Application queue notifications.
 
 ## 7. Assistant Chain
 
@@ -173,16 +284,26 @@ Current basic task:
 
 ## 8. Adding a New Module
 
-To add LMS, ERP, Exam LMS, Campus Leave, or another app:
+To add LMS, ERP, Exam LMS, or another app:
 
 1. Create `backend/modules/<module_key>/`.
 2. Add `schemas.py`, `service.py`, `router.py`, and `module.py`.
 3. Add permissions in `backend/core/rbac.py`.
 4. Create `frontend/src/modules/<module_key>/`.
-5. Add `<ModuleWidget>.tsx`, `<ModuleWidget>.css`, and `manifest.ts`.
+5. Add `<ModuleGlance>.tsx`, `<ModulePage>.tsx`, their CSS files, and `manifest.ts`.
 6. Use shared frontend types from `frontend/src/types/campus.ts`.
 7. Keep module-specific UI and CSS inside the module folder.
 
 This keeps development parallel-friendly and reduces merge conflicts.
 
 For detailed implementation rules, use `docs/module_development_guide.md` as the source of truth.
+
+For Menu-specific setup, Excel import, ratings, sick meals, and feedback behavior, use `docs/menu_module_implementation.md`.
+
+For Campus Room Tracker and Leave Application behavior, use `docs/campus_rooms_leave_modules.md`.
+
+Food Committee CSV upload template:
+
+```text
+docs/templates/foodcommittee_menu_upload_template.csv
+```

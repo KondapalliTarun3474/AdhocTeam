@@ -1,11 +1,12 @@
 import type { FormEvent } from 'react'
 import { useState } from 'react'
 import { sendAssistantMessage } from '../../api/client'
-import type { Role } from '../../types/campus'
+import type { Designation, Role } from '../../types/campus'
 import './AssistantPanel.css'
 
 interface AssistantPanelProps {
   campusId: string
+  designations?: Designation[]
   role: Role
   userId: string
 }
@@ -15,7 +16,7 @@ type AssistantMessage = {
   content: string
 }
 
-function AssistantPanel({ campusId, role, userId }: AssistantPanelProps) {
+function AssistantPanel({ campusId, designations = [], role, userId }: AssistantPanelProps) {
   const [messages, setMessages] = useState<AssistantMessage[]>([
     {
       role: 'assistant',
@@ -37,6 +38,7 @@ function AssistantPanel({ campusId, role, userId }: AssistantPanelProps) {
     const response = await sendAssistantMessage({
       message,
       campusId,
+      designations,
       userId,
       role,
     })

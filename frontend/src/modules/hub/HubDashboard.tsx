@@ -1,24 +1,23 @@
 import { useEffect, useMemo, useState } from 'react'
 import { DEFAULT_CAMPUS_ID, fetchHubOverview } from '../../api/client'
+import type { DemoProfile } from '../../accessProfiles'
+import { DEMO_PROFILES, DEFAULT_USER_ID } from '../../accessProfiles'
 import AssistantPanel from '../assistant/AssistantPanel'
 import { moduleManifestByKey, moduleManifests } from '../registry'
 import type { ComponentType } from 'react'
-import type { HubOverview, ModuleWidgetProps, Role } from '../../types/campus'
+import type { HubOverview, ModuleKey, ModuleWidgetProps } from '../../types/campus'
 import './HubDashboard.css'
-
-const USER_ID = 'demo-student'
-
-const ROLE_OPTIONS: Array<{ value: Role; label: string }> = [
-  { value: 'student', label: 'Student' },
-  { value: 'food_committee', label: 'Food Committee' },
-  { value: 'professor', label: 'Professor' },
-  { value: 'teaching_assistant', label: 'TA' },
-  { value: 'admin', label: 'Admin' },
-]
 
 interface ModuleWidgetEntry {
   key: string
   Widget: ComponentType<ModuleWidgetProps>
+}
+
+interface HubDashboardProps {
+  activeProfile: DemoProfile
+  onOpenModule: (moduleKey: ModuleKey) => void
+  onProfileChange: (profileId: string) => void
+  profileId: string
 }
 
 function formatDate(dateString: string) {
@@ -29,8 +28,12 @@ function formatDate(dateString: string) {
   }).format(new Date(`${dateString}T00:00:00`))
 }
 
-function HubDashboard() {
-  const [role, setRole] = useState<Role>('student')
+function HubDashboard({
+  activeProfile,
+  onOpenModule,
+  onProfileChange,
+  profileId,
+}: HubDashboardProps) {
   const [overview, setOverview] = useState<HubOverview | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
@@ -40,8 +43,9 @@ function HubDashboard() {
 
     fetchHubOverview({
       campusId: DEFAULT_CAMPUS_ID,
-      userId: USER_ID,
-      role,
+      userId: DEFAULT_USER_ID,
+      role: activeProfile.role,
+      designations: activeProfile.designations,
     }).then((data) => {
       if (!ignore) {
         setOverview(data)
@@ -52,7 +56,7 @@ function HubDashboard() {
     return () => {
       ignore = true
     }
-  }, [role])
+  }, [activeProfile])
 
   const connectedModules = useMemo(() => {
     return overview?.modules?.filter((module) => module.status === 'connected') ?? []
@@ -84,14 +88,14 @@ function HubDashboard() {
           </p>
         </div>
 
-        <div className="hub-role-panel" aria-label="Current role">
-          <span>View as</span>
+        <div className="hub-role-panel" aria-label="Demo access profile">
+          <span>Demo profile</span>
           <div className="hub-role-options">
-            {ROLE_OPTIONS.map((option) => (
+            {DEMO_PROFILES.map((option) => (
               <button
-                className={option.value === role ? 'active' : ''}
-                key={option.value}
-                onClick={() => setRole(option.value)}
+                className={option.id === profileId ? 'active' : ''}
+                key={option.id}
+                onClick={() => onProfileChange(option.id)}
                 type="button"
               >
                 {option.label}
@@ -108,8 +112,8 @@ function HubDashboard() {
             <strong>{dateLabel}</strong>
           </div>
           <div>
-            <span className="hub-status-label">Role</span>
-            <strong>{ROLE_OPTIONS.find((item) => item.value === role)?.label}</strong>
+            <span className="hub-status-label">Profile</span>
+            <strong>{activeProfile.label}</strong>
           </div>
           <div>
             <span className="hub-status-label">Connected Modules</span>
@@ -174,18 +178,21 @@ function HubDashboard() {
             {moduleWidgets.map(({ key, Widget }) => (
               <Widget
                 campusId={DEFAULT_CAMPUS_ID}
+                designations={activeProfile.designations}
                 isLoading={isLoading}
                 key={key}
+                openModule={onOpenModule}
                 overview={overview}
-                role={role}
-                userId={USER_ID}
+                role={activeProfile.role}
+                userId={DEFAULT_USER_ID}
               />
             ))}
           </div>
           <AssistantPanel
             campusId={DEFAULT_CAMPUS_ID}
-            role={role}
-            userId={USER_ID}
+            designations={activeProfile.designations}
+            role={activeProfile.role}
+            userId={DEFAULT_USER_ID}
           />
         </section>
 

@@ -8,6 +8,7 @@ The frontend is now TypeScript-first because this project will have many indepen
 
 - A module cannot silently return the wrong hub payload shape.
 - Role strings are checked against the shared `Role` union.
+- Student, professor, and staff designations are checked against the shared `Designation` union.
 - Widget props are shared through `ModuleWidgetProps`.
 - API responses such as `HubOverview`, `MenuDay`, and `CalendarItem` are documented in code.
 - Future app packaging as a PWA or native shell is easier when contracts are explicit.
@@ -22,8 +23,9 @@ When a new module is requested, describe it with this shape. Short answers are f
 Module name:
 Module key:
 Primary users/roles:
+Designations:
 What students can do:
-What staff/committee/professors can do:
+What staff/committee/professors/designated students can do:
 What admins can do:
 Data source for MVP:
 Pages/widgets needed now:
@@ -37,20 +39,21 @@ Example:
 ```text
 Module name: Menu
 Module key: menu
-Primary users/roles: student, food_committee, admin
-What students can do: view meals, review dishes
-What food committee can do: upload and update meals
-What admins can do: assign roles, moderate all data
-Data source for MVP: static JSON
-Pages/widgets needed now: today's menu widget, review form, manager update form
-Hub notifications/updates/calendar items: lunch published, dinner updated
+Primary users/roles: student, admin
+Designations: food_committee
+What students can do: view meals, rate items, request sick meals, send feedback
+What food committee can do: upload weekly Excel menus, update meals, read ratings, read sick meal requests, read feedback
+What admins can do: configure website/default app source, assign roles/designations, moderate all data
+Data source for MVP: IIITB Excel import plus module-local fallback JSON
+Pages/widgets needed now: setup selector, weekly menu, ratings, sick meals, feedback, committee editor
+Hub notifications/updates/calendar items: weekly menu published, upload reminder before Monday
 Assistant questions it should answer: what's for lunch, what is for dinner
 Anything explicitly out of scope: payment, inventory
 ```
 
 ## Why The Module Refactor Helps
 
-The repo is designed for parallel module development. Menu, LMS, ERP, Exam LMS, Campus Leave, and future apps should be built in their own folders.
+The repo is designed for parallel module development. Menu/Foode, Campus Room Tracker, Leave Application, LMS, ERP, Exam LMS, and future apps should be built in their own folders.
 
 The refactor helps because:
 
@@ -80,7 +83,20 @@ backend/
     menu/
       __init__.py
       default_menu.json
+      default_weekly_menu.json
       fetcher.py
+      module.py
+      router.py
+      schemas.py
+      service.py
+    campus_rooms/
+      __init__.py
+      module.py
+      router.py
+      schemas.py
+      service.py
+    campus_leave/
+      __init__.py
       module.py
       router.py
       schemas.py
@@ -116,9 +132,31 @@ frontend/src/
       HubDashboard.css
       HubDashboard.tsx
     menu/
+      api.ts
+      defaultMenu.ts
       manifest.ts
+      MenuGlance.css
+      MenuGlance.tsx
       MenuWidget.css
       MenuWidget.tsx
+      timings.ts
+      types.ts
+    campus_rooms/
+      api.ts
+      CampusRooms.css
+      CampusRoomsGlance.tsx
+      CampusRoomsPage.tsx
+      defaultRooms.ts
+      manifest.ts
+      types.ts
+    campus_leave/
+      api.ts
+      CampusLeave.css
+      CampusLeaveGlance.tsx
+      CampusLeavePage.tsx
+      defaultLeave.ts
+      manifest.ts
+      types.ts
   types/
     campus.ts
   App.css
@@ -143,25 +181,31 @@ backend/modules/lms/
 
 frontend/src/modules/lms/
   manifest.ts
-  LmsWidget.tsx
-  LmsWidget.css
+  LmsGlance.tsx          # dashboard summary only
+  LmsGlance.css
+  LmsPage.tsx            # full module workflow
+  LmsPage.css
   api.ts                 # optional module-local frontend API helper
   types.ts               # optional module-local types
+  defaultLms.ts           # optional module-local seed/mock data
 ```
 
 Use lowercase snake case for module folders and keys:
 
 - `menu`
+- `campus_rooms`
+- `campus_leave`
 - `lms`
 - `erp`
 - `exam_lms`
-- `campus_leave`
 
 Use PascalCase for React components:
 
 - `MenuWidget`
-- `LmsWidget`
-- `ExamLmsWidget`
+- `LmsGlance`
+- `LmsPage`
+- `ExamLmsGlance`
+- `ExamLmsPage`
 
 ## Backend Module Contract
 
@@ -178,7 +222,8 @@ MODULE = CampusModule(
     name="LMS",
     status="connected",
     summary="Courses, assignments, materials, and TA workflows.",
-    roles=(Role.STUDENT, Role.PROFESSOR, Role.TEACHING_ASSISTANT, Role.ADMIN),
+    roles=(Role.STUDENT, Role.PROFESSOR, Role.ADMIN),
+    designations=(Designation.TEACHING_ASSISTANT,),
     router=router,
 )
 ```
@@ -186,7 +231,7 @@ MODULE = CampusModule(
 If the module contributes dashboard data, add a hub provider:
 
 ```python
-def lms_hub_provider(campus_id, user_id, role, today):
+def lms_hub_provider(campus_id, user_id, role, today, designations):
     return {
         "module_data": {
             "lms": {
@@ -202,7 +247,8 @@ MODULE = CampusModule(
     name="LMS",
     status="connected",
     summary="Courses, assignments, materials, and TA workflows.",
-    roles=(Role.STUDENT, Role.PROFESSOR, Role.TEACHING_ASSISTANT, Role.ADMIN),
+    roles=(Role.STUDENT, Role.PROFESSOR, Role.ADMIN),
+    designations=(Designation.TEACHING_ASSISTANT,),
     router=router,
     hub_provider=lms_hub_provider,
 )
@@ -246,6 +292,23 @@ Add new permissions in `backend/core/rbac.py`. Keep names predictable:
 
 For hackathon MVP, role is passed through the `X-User-Role` header. Do not build module-specific login/auth yet. Later, real auth should resolve user roles centrally and keep the same permission names.
 
+Designations are passed through `X-User-Designations` as a comma-separated header during the MVP:
+
+```text
+X-User-Role: student
+X-User-Designations: food_committee,teaching_assistant
+```
+
+Use designations for additional responsibilities rather than inventing a global role for each duty:
+
+- Food Committee: student designation.
+- Teaching Assistant: student designation.
+- Warden: professor designation.
+- Security: staff designation.
+- Classroom Support: staff designation.
+
+Do not add a global role unless it describes the person's base identity across the campus, such as `student`, `professor`, `staff`, or `admin`.
+
 ## Database Pattern
 
 For any persisted module data, prefer campus-scoped tables:
@@ -267,7 +330,9 @@ UNIQUE(campus_id, date, item_key)
 
 Do not key shared campus data by `user_id` unless the data is truly user-specific. Menus, events, exam schedules, and notices are usually campus-level. Reviews, submissions, leave requests, and personal preferences are user-level.
 
-For now, schema changes go in `backend/schema.sql`. Keep table names module-prefixed when there is a chance of collision, such as `lms_assignments`, `exam_lms_slots`, or `campus_leave_requests`.
+For now, schema changes go in `backend/schema.sql`. Keep table names module-prefixed when there is a chance of collision, such as `lms_assignments`, `exam_lms_slots`, or `campus_leave_applications`.
+
+Use shared campus-level tables only when the data will be reused by multiple modules. Current example: `campus_courses` is intentionally shared because Room Tracker, LMS, and Exam LMS will all need stable course IDs.
 
 ## Frontend Module Contract
 
@@ -275,15 +340,18 @@ Every frontend module must expose `manifest.ts`.
 
 ```ts
 import type { FrontendModuleManifest } from '../../types/campus'
-import LmsWidget from './LmsWidget'
+import LmsGlance from './LmsGlance'
+import LmsPage from './LmsPage'
 
 export const manifest: FrontendModuleManifest = {
   key: 'lms',
   name: 'LMS',
   summary: 'Courses, assignments, materials, and TA workflows.',
   status: 'connected',
-  roles: ['student', 'professor', 'teaching_assistant', 'admin'],
-  Widget: LmsWidget,
+  roles: ['student', 'professor', 'admin'],
+  designations: ['teaching_assistant'],
+  Page: LmsPage,
+  Widget: LmsGlance,
 }
 
 export default manifest
@@ -294,20 +362,26 @@ The widget must accept `ModuleWidgetProps`:
 ```tsx
 import type { ModuleWidgetProps } from '../../types/campus'
 
-function LmsWidget({ campusId, overview, role, userId }: ModuleWidgetProps) {
+function LmsGlance({ campusId, designations, openModule, overview, role, userId }: ModuleWidgetProps) {
   return <section>...</section>
 }
 
-export default LmsWidget
+export default LmsGlance
 ```
+
+`Widget` is the dashboard glance only. It should show the minimum useful summary and an action that calls `openModule?.('<module_key>')`.
+
+`Page` is the full module experience opened from the left navigation or from the dashboard glance. Put tabs, forms, uploads, detailed tables, and module-specific workflows in `Page`, not in `Widget`.
 
 The hub discovers manifests through `frontend/src/modules/registry.ts`. Do not import a new module directly inside `HubDashboard.tsx`.
 
 Recommended frontend ownership:
 
 - `manifest.ts`: module metadata and widget registration.
-- `<ModuleWidget>.tsx`: dashboard-level module widget.
-- `<ModuleWidget>.css`: module-local styles using design tokens.
+- `<ModuleGlance>.tsx`: dashboard-level module summary.
+- `<ModuleGlance>.css`: module-local glance styles using design tokens.
+- `<ModulePage>.tsx`: full module workflow.
+- `<ModulePage>.css`: module-local page styles using design tokens.
 - `api.ts`: optional module-local frontend API calls.
 - `types.ts`: optional module-local types that should not be global.
 
@@ -360,7 +434,7 @@ For new modules, prefer putting detailed module-specific data under `module_data
 Example module contribution:
 
 ```python
-def lms_hub_provider(campus_id, user_id, role, today):
+def lms_hub_provider(campus_id, user_id, role, today, designations):
     return {
         "notifications": [],
         "updates": [],
@@ -374,7 +448,7 @@ def lms_hub_provider(campus_id, user_id, role, today):
     }
 ```
 
-Important: the current hub service merges `module_data` safely, but module-specific `notifications`, `updates`, and `calendar` merging should be added before multiple modules publish those lists dynamically. Until then, a module can expose detailed data under `module_data` and the hub can decide what to display.
+The hub service merges module-specific `notifications`, `updates`, `calendar`, and `module_data`. Keep these contributions short. Full workflows still belong in module pages.
 
 ## Assistant Integration
 

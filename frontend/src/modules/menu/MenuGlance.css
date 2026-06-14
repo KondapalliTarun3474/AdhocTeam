@@ -1,0 +1,118 @@
+.menu-glance {
+  background: var(--cb-white);
+  border: 1px solid var(--cb-border);
+  border-radius: 8px;
+  box-shadow: var(--cb-shadow);
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  padding: 18px;
+}
+
+.menu-glance-header {
+  align-items: flex-start;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.menu-glance-header span,
+.menu-glance-meal span {
+  color: var(--cb-cyan);
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 900;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.menu-glance-header h2,
+.menu-glance-meal h3 {
+  color: var(--cb-ink);
+  margin: 0;
+}
+
+.menu-glance-header h2 {
+  font-size: 1.08rem;
+}
+
+.menu-glance-header strong {
+  background: var(--cb-callout);
+  border-radius: 999px;
+  color: var(--cb-blue);
+  font-size: 0.8rem;
+  padding: 7px 10px;
+}
+
+.menu-glance-body {
+  background: var(--cb-paper);
+  border: 1px solid var(--cb-border);
+  border-radius: 8px;
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+}
+
+.menu-glance-meal h3 {
+  color: var(--cb-orange);
+  font-size: 1.24rem;
+}
+
+.menu-glance ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.menu-glance li {
+  background: var(--cb-white);
+  border: 1px solid var(--cb-border);
+  border-radius: 999px;
+  color: var(--cb-ink);
+  font-size: 0.78rem;
+  line-height: 1.25;
+  padding: 6px 9px;
+}
+
+.menu-glance p {
+  color: var(--cb-muted);
+  margin: 0;
+}
+
+.menu-glance-reminder {
+  border-left: 4px solid var(--cb-orange);
+  display: grid;
+  gap: 4px;
+  padding-left: 10px;
+}
+
+.menu-glance-reminder strong {
+  color: var(--cb-ink);
+  font-size: 0.9rem;
+}
+
+.menu-glance-reminder span {
+  color: var(--cb-muted);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.menu-glance button {
+  background: var(--cb-blue);
+  border-radius: 6px;
+  color: var(--cb-white);
+  cursor: pointer;
+  font-weight: 900;
+  min-height: 42px;
+  padding: 10px 14px;
+}
+
+.menu-glance-empty {
+  background: var(--cb-paper);
+  border: 1px solid var(--cb-border);
+  border-radius: 8px;
+  padding: 14px;
+}

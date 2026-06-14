@@ -1,13 +1,16 @@
 import type { FrontendModuleManifest } from '../../types/campus'
+import MenuGlance from './MenuGlance'
 import MenuWidget from './MenuWidget'
 
 export const manifest: FrontendModuleManifest = {
   key: 'menu',
-  name: 'Menu',
-  summary: 'Today meals, food committee updates, and student reviews.',
+  name: 'Foode',
+  summary: 'Weekly meals, item ratings, sick meals, and feedback.',
   status: 'connected',
-  roles: ['student', 'food_committee', 'admin'],
-  Widget: MenuWidget,
+  roles: ['student', 'admin'],
+  designations: ['food_committee'],
+  Page: MenuWidget,
+  Widget: MenuGlance,
 }
 
 export default manifest
