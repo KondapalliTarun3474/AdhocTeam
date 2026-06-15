@@ -1,6 +1,6 @@
 import os
 from datetime import datetime
-from typing import List, Callable
+from typing import List, Callable, Dict
 
 from core.module_registry import discover_modules
 from modules.menu.service import DEFAULT_CAMPUS_ID
@@ -9,8 +9,18 @@ try:
     from langchain.agents import AgentExecutor, create_tool_calling_agent
     from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
     from langchain_groq import ChatGroq
+    from langchain_core.chat_history import InMemoryChatMessageHistory
+    from langchain_core.runnables.history import RunnableWithMessageHistory
 except ImportError:
     ChatGroq = None
+
+
+SESSION_STORE: Dict[str, InMemoryChatMessageHistory] = {}
+
+def get_session_history(session_id: str) -> InMemoryChatMessageHistory:
+    if session_id not in SESSION_STORE:
+        SESSION_STORE[session_id] = InMemoryChatMessageHistory()
+    return SESSION_STORE[session_id]
 
 
 def _get_all_tools() -> List[Callable]:
@@ -28,14 +38,14 @@ def chat_with_agent(
     role: str = "student",
 ) -> str:
     """
-    CampusBuddy LangChain Agent using Groq and dynamic tool discovery.
+    CampusBuddy LangChain Agent using Groq, dynamic tool discovery, and session memory.
     """
     if not os.environ.get("GROQ_API_KEY") or not ChatGroq:
         return "The AI assistant is currently offline because LangChain/Groq is not configured."
 
     try:
         tools = _get_all_tools()
-        llm = ChatGroq(temperature=0, model_name="llama-3.1-8b-instant")
+        llm = ChatGroq(temperature=0, model_name="llama-3.3-70b-versatile")
         
         from datetime import timedelta
         current_date_obj = datetime.now()
@@ -48,30 +58,48 @@ Tomorrow's Date: {tomorrow_date_str}
 User ID: {user_id}
 User Role: {role}
 
-You have access to several tools across different campus modules (Food Menu, Room Bookings, Leave Applications).
+You have access to several tools across different campus modules (Food Menu, Room Bookings, Leave Applications, Past Ratings).
 Use these tools to gather information or perform actions on behalf of the user.
 
 CRITICAL RULES:
-1. DATES: Always use the exact dates provided above when checking for "today" or "tomorrow".
-2. LEAVES VS CASUAL OUTINGS: 
-   - FORMAL LEAVE: If the user says "apply for leave" or "I am going home", this is a Formal Leave. ONLY for Formal Leaves, you must check their classes using `get_room_bookings_and_courses` and apply using `apply_for_campus_leave`.
-   - CASUAL OUTING: If the user says they are going for "dinner", "shopping", or coming back late tonight, this is a Casual Outing. NEVER check class schedules for casual outings. NEVER apply for leave for casual outings.
-3. CURFEW ADVICE (CASUAL OUTINGS): Curfew is 10:30 PM. For casual outings, you MUST call the `get_student_profile` tool to see how many "curfew_violations" the user has. You MUST explicitly tell the user their current number of violations in your response. If they have 4 or more, warn them strictly.
-4. CONFIRM ACTIONS: If you successfully use a tool to create or submit something, you MUST explicitly tell the user that the action was successfully completed in your final response.
-5. Do not invent data. If a tool returns an error or no data, inform the user honestly.
+1. AUTONOMY & INTELLIGENCE: You are a smart, autonomous campus assistant. When a user asks a question or makes a request, use your reasoning to deduce which tools to call. You will often need to call multiple tools sequentially to build a complete, helpful answer.
+2. CASUAL OUTINGS VS FORMAL LEAVES (BUSINESS LOGIC): 
+   - A "Formal Leave" is for overnight stays, going home, or medical emergencies. 
+   - A "Casual Outing" is going to the mall, skipping a meal, or a quick errand. Casual outings DO NOT require a leave application. 
+3. NEVER AUTO-SUBMIT: You are strictly forbidden from calling `apply_for_campus_leave` or `submit_food_rating` unless the user explicitly asks you to "apply" or "submit" it, AND you have asked for their final confirmation.
+4. HOLISTIC CONTEXT & FILTERING: Always consider the big picture constraints (classes, curfew). When checking past food ratings against a specific meal (e.g., lunch), you MUST silently filter the ratings. NEVER mention or suggest an item from past ratings if it is NOT on today's menu for that specific meal. The user only cares about what is available *right now*. Synthesize data from multiple tools to provide intelligent, highly filtered responses.
+5. TOOL EXECUTION: You must actually execute the tools to get data. Do not output raw JSON or `<function>` tags to the user. Wait for the tool to return data before giving your final answer.
+6. DATA INTEGRITY: Before submitting any data (like food ratings), ensure you have the exact spelling of the item from the menu. If the user's request is missing required information (like a star rating out of 5, or specific dates), do not guess—ask the user for the missing details first.
+7. CONFIRM ACTIONS: If you successfully perform an action on behalf of the user (like submitting a rating or leave), explicitly confirm it in your final response.
+8. HONESTY: Do not hallucinate or invent data. If a tool returns an error, tell the user honestly.
 """
 
         prompt = ChatPromptTemplate.from_messages([
             ("system", system_prompt),
+            MessagesPlaceholder(variable_name="chat_history"),
             ("human", "{input}"),
             MessagesPlaceholder(variable_name="agent_scratchpad"),
         ])
 
         agent = create_tool_calling_agent(llm, tools, prompt)
         agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
+        
+        agent_with_chat_history = RunnableWithMessageHistory(
+            agent_executor,
+            get_session_history,
+            input_messages_key="input",
+            history_messages_key="chat_history",
+        )
 
-        result = agent_executor.invoke({"input": message})
+        result = agent_with_chat_history.invoke(
+            {"input": message},
+            config={"configurable": {"session_id": user_id}}
+        )
         return result["output"]
 
     except Exception as e:
+        import traceback
+        traceback.print_exc()
+        if hasattr(e, "failed_generation"):
+            return f"Error connecting to CampusBuddy AI: {str(e)} - Generation: {e.failed_generation}"
         return f"Error connecting to CampusBuddy AI: {str(e)}"

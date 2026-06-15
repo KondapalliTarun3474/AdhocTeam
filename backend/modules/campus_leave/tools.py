@@ -6,7 +6,10 @@ from modules.campus_leave.schemas import LeaveApplicationRequest
 
 @tool
 def check_leave_status(user_id: str) -> str:
-    """Check the current active or pending campus leave application for a student."""
+    """Check if the student currently has an active or pending formal leave application.
+    Returns the details of their current leave (if any).
+    Use this when the user asks if their leave was approved or if they have active leaves.
+    """
     try:
         leave = active_leave_for_student(campus_id=DEFAULT_CAMPUS_ID, user_id=user_id)
         if leave:
@@ -17,7 +20,11 @@ def check_leave_status(user_id: str) -> str:
 
 @tool
 def get_student_profile(user_id: str) -> str:
-    """Get the student's profile information, including their curfew violations."""
+    """Get the student's profile information, specifically their curfew violations and emergency contacts.
+    Returns the student's name, phone, and total number of curfew_violations.
+    Use this when the user is planning a Casual Outing (like going to the mall or skipping dinner).
+    You must check their curfew_violations. If they have 4 or more, warn them they must return before 10:30 PM.
+    """
     try:
         profile = _profile_for(DEFAULT_CAMPUS_ID, user_id)
         if profile:
@@ -42,8 +49,11 @@ def apply_for_campus_leave(
     student_name: Optional[str] = None,
     emergency_contact: Optional[str] = None
 ) -> str:
-    """Apply for a campus leave (gate-pass).
-    Use this tool ONLY when the user explicitly wants to apply for a formal leave.
+    """Submit a formal leave application (gate-pass) to the database.
+    Creates a new leave request pending approval.
+    Use this ONLY when the user explicitly asks to apply for leave, go home for the weekend, or take a medical leave.
+    NEVER use this tool for a Casual Outing like going to the mall.
+    If the user is missing required details like dates, destination, reason, guardian email/phone, you MUST ask them for the missing info before calling this tool.
     """
     try:
         profile = _profile_for(DEFAULT_CAMPUS_ID, user_id)

@@ -795,6 +795,28 @@ def list_ratings(campus_id: str) -> List[MenuRatingRequest]:
     return [rating for rating in _RATINGS if rating.campus_id == campus_id]
 
 
+def get_user_food_ratings(
+    user_id: str,
+    campus_id: str = DEFAULT_CAMPUS_ID,
+    supabase: Any = None,
+) -> List[Dict[str, Any]]:
+    db = supabase or get_supabase()
+    if not db:
+        return [rating.dict() for rating in _RATINGS if rating.user_id == user_id]
+
+    try:
+        response = (
+            db.table("menu_item_ratings")
+            .select("item_name, rating, comment, date")
+            .eq("campus_id", campus_id)
+            .eq("user_id", user_id)
+            .execute()
+        )
+        return response.data or []
+    except Exception:
+        return []
+
+
 def summarize_ratings(campus_id: str) -> List[MenuRatingSummary]:
     grouped: Dict[str, Dict[str, Any]] = {}
     for rating in list_ratings(campus_id):
