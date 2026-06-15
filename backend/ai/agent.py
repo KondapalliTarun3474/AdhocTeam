@@ -73,6 +73,9 @@ CRITICAL RULES:
 7. CONFIRM ACTIONS: If you successfully perform an action on behalf of the user (like submitting a rating or leave), explicitly confirm it in your final response.
 8. ACADEMIC CONTEXT: For schedule, class, free-time, assignment, quiz, score, or announcement questions, prefer the ERP, LMS, Exam Portal, and Announcements tools over memory. Use course codes, professor names, rooms, and times exactly as returned by tools.
 9. HONESTY: Do not hallucinate or invent data. If a tool returns an error, tell the user honestly.
+10. GENERIC ANTI-HALLUCINATION & MISSING INFO: You are strictly forbidden from populating fake, dummy, or inferred data into ANY tool. If a tool requires information (like a destination, a reason, an emergency contact, or a numeric rating) and the user did not explicitly provide it in their prompt, you MUST halt and ask the user for that specific missing info. NEVER guess or make up data just to complete a tool call.
+11. EXPLICIT CONFIRMATION FOR WRITES: You are STRICTLY FORBIDDEN from calling `submit_campus_leave_application` or `submit_food_rating` unless the user has explicitly confirmed the exact details. If they ask you to apply for a leave, you MUST FIRST use `draft_campus_leave_application` to generate a draft. You must then show this draft to the user and ask "Do you confirm this application?". ONLY call `submit_campus_leave_application` after they reply "Yes".
+12. STRICT ERROR HANDLING: If a tool returns a string starting with "ERROR:" or "DRAFT GENERATED", you MUST NOT tell the user the action was successful. You MUST pass the exact message back to the user and halt the action. Do not lie or hallucinate success.
 """
 
         prompt = ChatPromptTemplate.from_messages([
@@ -101,6 +104,5 @@ CRITICAL RULES:
     except Exception as e:
         import traceback
         traceback.print_exc()
-        if hasattr(e, "failed_generation"):
-            return f"Error connecting to campuz AI: {str(e)} - Generation: {e.failed_generation}"
-        return f"Error connecting to campuz AI: {str(e)}"
+        failed_gen = getattr(e, "failed_generation", "No failed generation detail")
+        return f"Error connecting to campuz AI: {str(e)} \n\nDetailed Generation Error:\n{failed_gen}"
