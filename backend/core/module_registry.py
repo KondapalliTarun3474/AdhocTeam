@@ -25,6 +25,7 @@ class CampusModule:
     designations: Tuple[Designation, ...] = ()
     router: Optional[APIRouter] = None
     hub_provider: Optional[HubProvider] = None
+    agent_tools: Optional[List[Callable]] = None
 
     def summary_for_access(
         self,

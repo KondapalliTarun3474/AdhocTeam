@@ -7,3 +7,4 @@ langchain-groq
 python-dotenv
 apscheduler
 requests
+httpx[http2]

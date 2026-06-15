@@ -1,6 +1,6 @@
 import uuid
 from datetime import date, datetime, timedelta
-from typing import Any, Dict, Iterable, List, Optional
+from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 from core.rbac import Designation, Role
 from database import get_supabase
@@ -361,7 +361,7 @@ def get_workspace(
     campus_id: str = DEFAULT_CAMPUS_ID,
     user_id: str = "demo-student",
     role: Role = Role.STUDENT,
-    designations: tuple[Designation, ...] = (),
+    designations: Tuple[Designation, ...] = (),
 ) -> CampusLeaveWorkspace:
     profile = _profile_for(campus_id, user_id)
     can_see_all = (

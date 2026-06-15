@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, Tuple
 
 from core.module_registry import CampusModule
 from core.rbac import Designation, Role
@@ -11,7 +11,7 @@ def rooms_hub_provider(
     user_id: str,
     role: Role,
     today: str,
-    designations: tuple[Designation, ...],
+    designations: Tuple[Designation, ...],
 ) -> Dict[str, Any]:
     workspace = get_workspace(campus_id=campus_id)
     calendar = [
@@ -36,14 +36,15 @@ def rooms_hub_provider(
         },
     }
 
+from modules.campus_rooms.tools import ROOM_TOOLS
 
 MODULE = CampusModule(
     key="campus_rooms",
-    name="Campus Room Tracker",
+    name="Campus Rooms",
     status="connected",
-    summary="Room bookings, course-linked classes, and classroom support blocks.",
-    roles=(Role.STUDENT, Role.PROFESSOR, Role.STAFF, Role.ADMIN),
-    designations=(Designation.CLASSROOM_SUPPORT, Designation.WARDEN, Designation.SECURITY),
+    summary="Classroom schedules, course associations, and maintenance booking.",
+    roles=(Role.STUDENT, Role.STAFF, Role.ADMIN),
     router=router,
     hub_provider=rooms_hub_provider,
+    agent_tools=ROOM_TOOLS,
 )

@@ -1,77 +1,77 @@
 import os
-from datetime import date
+from datetime import datetime
+from typing import List, Callable
 
-from modules.menu.service import DEFAULT_CAMPUS_ID, format_menu_for_assistant
+from core.module_registry import discover_modules
+from modules.menu.service import DEFAULT_CAMPUS_ID
 
 try:
-    from langchain_core.output_parsers import StrOutputParser
-    from langchain_core.prompts import ChatPromptTemplate
+    from langchain.agents import AgentExecutor, create_tool_calling_agent
+    from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
     from langchain_groq import ChatGroq
 except ImportError:
     ChatGroq = None
-    ChatPromptTemplate = None
-    StrOutputParser = None
 
 
-MENU_KEYWORDS = {"lunch", "dinner", "breakfast", "menu", "food", "eat", "dish"}
-
-
-def _fallback_response(message: str, menu_context: str) -> str:
-    msg_lower = message.lower()
-    if any(keyword in msg_lower for keyword in MENU_KEYWORDS):
-        return menu_context
-    return (
-        "I can help with campus updates, calendar context, and module data. "
-        "The LangChain Groq runtime is not configured yet, so I am returning "
-        "deterministic module responses for now."
-    )
+def _get_all_tools() -> List[Callable]:
+    tools = []
+    for module in discover_modules():
+        if module.agent_tools:
+            tools.extend(module.agent_tools)
+    return tools
 
 
 def chat_with_agent(
     message: str,
     campus_id: str = DEFAULT_CAMPUS_ID,
+    user_id: str = "demo-student",
     role: str = "student",
 ) -> str:
     """
-    Hackathon-stable LCEL routing.
-    Each module exposes plain data functions; the chain only formats that data.
+    CampusBuddy LangChain Agent using Groq and dynamic tool discovery.
     """
-    current_date = date.today().isoformat()
-    menu_context = format_menu_for_assistant(campus_id, current_date)
-    msg_lower = message.lower()
-
     if not os.environ.get("GROQ_API_KEY") or not ChatGroq:
-        return _fallback_response(message, menu_context)
+        return "The AI assistant is currently offline because LangChain/Groq is not configured."
 
     try:
+        tools = _get_all_tools()
         llm = ChatGroq(temperature=0, model_name="llama-3.1-8b-instant")
-        if any(keyword in msg_lower for keyword in MENU_KEYWORDS):
-            prompt = ChatPromptTemplate.from_messages([
-                (
-                    "system",
-                    "You are CampusBuddy, a campus assistant. The user's role is {role}. "
-                    "Answer only from this Menu module data. Do not invent unavailable dishes.\n\n"
-                    "{menu_context}",
-                ),
-                ("human", "{input}")
-            ])
-            chain = prompt | llm | StrOutputParser()
-            return chain.invoke({
-                "role": role,
-                "menu_context": menu_context,
-                "input": message,
-            })
+        
+        from datetime import timedelta
+        current_date_obj = datetime.now()
+        current_time_str = current_date_obj.isoformat()
+        tomorrow_date_str = (current_date_obj + timedelta(days=1)).strftime('%Y-%m-%d')
+        
+        system_prompt = f"""You are CampusBuddy, an intelligent, helpful AI assistant for university students.
+Current Date & Time: {current_time_str}
+Tomorrow's Date: {tomorrow_date_str}
+User ID: {user_id}
+User Role: {role}
+
+You have access to several tools across different campus modules (Food Menu, Room Bookings, Leave Applications).
+Use these tools to gather information or perform actions on behalf of the user.
+
+CRITICAL RULES:
+1. DATES: Always use the exact dates provided above when checking for "today" or "tomorrow".
+2. LEAVES VS CASUAL OUTINGS: 
+   - FORMAL LEAVE: If the user says "apply for leave" or "I am going home", this is a Formal Leave. ONLY for Formal Leaves, you must check their classes using `get_room_bookings_and_courses` and apply using `apply_for_campus_leave`.
+   - CASUAL OUTING: If the user says they are going for "dinner", "shopping", or coming back late tonight, this is a Casual Outing. NEVER check class schedules for casual outings. NEVER apply for leave for casual outings.
+3. CURFEW ADVICE (CASUAL OUTINGS): Curfew is 10:30 PM. For casual outings, you MUST call the `get_student_profile` tool to see how many "curfew_violations" the user has. You MUST explicitly tell the user their current number of violations in your response. If they have 4 or more, warn them strictly.
+4. CONFIRM ACTIONS: If you successfully use a tool to create or submit something, you MUST explicitly tell the user that the action was successfully completed in your final response.
+5. Do not invent data. If a tool returns an error or no data, inform the user honestly.
+"""
 
         prompt = ChatPromptTemplate.from_messages([
-            (
-                "system",
-                "You are CampusBuddy, a concise campus hub assistant. "
-                "Explain what the hub can do and ask which module the user wants.",
-            ),
-            ("human", "{input}")
+            ("system", system_prompt),
+            ("human", "{input}"),
+            MessagesPlaceholder(variable_name="agent_scratchpad"),
         ])
-        chain = prompt | llm | StrOutputParser()
-        return chain.invoke({"input": message})
+
+        agent = create_tool_calling_agent(llm, tools, prompt)
+        agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
+
+        result = agent_executor.invoke({"input": message})
+        return result["output"]
 
     except Exception as e:
-        return f"Error: {str(e)}"
+        return f"Error connecting to CampusBuddy AI: {str(e)}"

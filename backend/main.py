@@ -50,6 +50,7 @@ def chat(request: ChatRequest):
     response = chat_with_agent(
         request.message,
         campus_id=request.campus_id,
+        user_id=request.user_id,
         role=request.role,
     )
     return {"reply": response}

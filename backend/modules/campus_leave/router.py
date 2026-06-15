@@ -1,3 +1,5 @@
+from typing import Set
+
 from fastapi import APIRouter, Depends
 
 from core.rbac import Designation, Role, get_designations, require_permission
@@ -29,7 +31,7 @@ def read_workspace(
     campus_id: str = DEFAULT_CAMPUS_ID,
     user_id: str = "demo-student",
     role: Role = Depends(require_permission("campus_leave:view")),
-    designations: set[Designation] = Depends(get_designations),
+    designations: Set[Designation] = Depends(get_designations),
 ):
     return get_workspace(
         campus_id=campus_id,
