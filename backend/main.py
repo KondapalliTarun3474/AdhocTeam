@@ -9,7 +9,7 @@ from modules.hub.router import router as hub_router
 from modules.menu.service import DEFAULT_CAMPUS_ID, get_menu_for_date
 
 
-app = FastAPI(title="CampusBuddy API")
+app = FastAPI(title="campuz API")
 
 app.add_middleware(
     CORSMiddleware,
@@ -28,7 +28,7 @@ for campus_module in discover_modules():
 @app.get("/")
 def read_root():
     return {
-        "message": "CampusBuddy API running",
+        "message": "campuz API running",
         "modules": ["hub", "rbac"] + [module.key for module in discover_modules()],
     }
 

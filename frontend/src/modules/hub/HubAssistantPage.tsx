@@ -292,7 +292,7 @@ function HubAssistantPage({ activeProfile }: HubAssistantPageProps) {
       <header className="hub-assistant-header">
         <div>
           <span>Hub Assistant</span>
-          <h1>CampusBuddy AI Chat</h1>
+          <h1>campuz AI Chat</h1>
         </div>
         <div className="hub-assistant-actions">
           <button onClick={() => setIsFocusMode((current) => !current)} type="button">

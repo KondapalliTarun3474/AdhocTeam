@@ -9,4 +9,37 @@ body {
   min-width: 320px;
   min-height: 100vh;
   background: var(--cb-paper);
+  font-family: var(--cb-font-body);
+  font-weight: 300;
+  line-height: 1.33;
+}
+
+h1 {
+  font-family: var(--cb-font-display);
+  font-weight: 300;
+  letter-spacing: 0;
+}
+
+h2,
+h3,
+h4,
+h5,
+h6,
+button,
+strong,
+label,
+th {
+  font-family: var(--cb-font-body);
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+p,
+li,
+input,
+textarea,
+select {
+  font-family: var(--cb-font-body);
+  font-weight: 300;
+  letter-spacing: 0;
 }

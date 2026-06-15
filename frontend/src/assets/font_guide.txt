@@ -1,0 +1,33 @@
+Typography plays an important role in Amazon Echo brand recognition. It communicates a consistent, unified identity and gives instant personality to our written words. Amazon Ember is the master brand font for all Amazon products and services.
+
+Amazon Ember:
+For Amazon Echo, two weights may be used: Amazon Ember Light and Amazon Ember Bold.
+
+Amazon Ember Light
+Amazon Ember Light is a clean, modern typeface that conveys a simplicity and charm that matches the Amazon Echo brand personality.
+
+Amazon Ember Bold
+Amazon Ember Bold is strong, easy, and simple. Use it for subheads, calls to action, and as part of body copy for emphasis.
+
+No more than 10 consecutive words should be set in Amazon Ember Bold to ensure brevity, simplicity of thought, and clear areas of emphasis.
+
+Amazon Ember Display
+Display weights have different characteristics and should be used for brand names, large scale applications (over 72 pt), headlines, or single-word callouts.
+
+
+typesetting
+1. Headlines
+Headlines are set in Amazon Ember Display Light. Use sentence case and proper punctuation. The space after a headline should be between ¼ –⅔ times the leading.
+
+2. Subheads
+Subheads are set in Amazon Ember Bold and are attached to body copy on a new line or as a lead-in within the first paragraph. They should be no more than ½ the point size of the headline font.
+
+3. Body Copy
+Body copy is set in Amazon Ember Light. It should always be left-aligned and never exceed 15 words per line.
+
+4. Tracking and leading
+Tracking on both headlines and body copy should be set to 0 in most cases. Optical kerning is suggested for use on headlines.
+Leading should be set to roughly 1⅓ the type size.
+
+5. White space
+White space is important to convey a sense of simplicity and ease. All copy must be at least two (2) cap-height units away from all borders and 1.5 cap-height units away from all other foreground objects.

@@ -21,24 +21,28 @@
 }
 
 .app-brand {
+  align-items: start;
   border-bottom: 1px solid var(--cb-border);
   display: grid;
-  gap: 4px;
+  gap: 8px;
   margin-bottom: 16px;
-  padding: 8px 8px 18px;
+  padding: 4px 8px 18px;
 }
 
-.app-brand span {
-  color: var(--cb-cyan);
-  font-size: 0.72rem;
-  font-weight: 900;
-  text-transform: uppercase;
+.app-brand img {
+  display: block;
+  height: auto;
+  max-width: 178px;
+  object-fit: contain;
+  width: 72%;
 }
 
 .app-brand strong {
-  color: var(--cb-ink);
-  font-size: 1.45rem;
-  line-height: 1;
+  color: var(--cb-muted);
+  font-family: var(--cb-font-body);
+  font-size: 0.78rem;
+  line-height: 1.2;
+  text-transform: uppercase;
 }
 
 .app-nav {

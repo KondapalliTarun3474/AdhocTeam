@@ -1,4 +1,4 @@
--- Supabase SQL Schema for CampusBuddy
+-- Supabase SQL Schema for campuz
 
 CREATE TABLE IF NOT EXISTS module_configs (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

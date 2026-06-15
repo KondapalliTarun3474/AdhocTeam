@@ -50,7 +50,7 @@ def submit_food_rating(
         # Prevent LLM from guessing strings like "bad" instead of asking the user for a number
         if not str(rating).strip().isdigit() or not (1 <= int(str(rating).strip()) <= 5):
             return "ERROR: You MUST ask the user for a numeric rating (1-5) before submitting."
-            
+
         # Guarantee exact spelling against the actual menu FOR THE SPECIFIC MEAL
         menu = get_menu_for_date(campus_id=DEFAULT_CAMPUS_ID, target_date=date)
         valid_items = []
@@ -58,21 +58,21 @@ def submit_food_rating(
             # Handle plural vs singular like "snack" vs "snacks"
             if meal_type.lower() in meal.meal_type.lower() or meal.meal_type.lower() in meal_type.lower():
                 valid_items.extend(meal.items)
-                
+
         if not valid_items:
             return f"ERROR: Could not find any items for meal type '{meal_type}' on {date}."
-            
+
         import difflib
-        
+
         # Make matching case-insensitive
         valid_items_map = {item.lower(): item for item in valid_items}
         matches = difflib.get_close_matches(item_name.lower(), list(valid_items_map.keys()), n=1, cutoff=0.5)
-        
+
         if matches:
             exact_item_name = valid_items_map[matches[0]]
         else:
             return f"ERROR: '{item_name}' is not on the {meal_type} menu for {date}. Valid items for {meal_type} are: {', '.join(valid_items)}"
-            
+
         req = MenuRatingRequest(
             campus_id=DEFAULT_CAMPUS_ID,
             user_id=user_id,
@@ -84,7 +84,7 @@ def submit_food_rating(
             comment=comment
         )
         res = save_rating(req, get_supabase())
-        
+
         # --- EXTERNAL API INTEGRATION (LIVE DEMO) ---
         import os
         from dotenv import load_dotenv
@@ -103,7 +103,7 @@ def submit_food_rating(
                         if str(item.get("name", "")).lower() == exact_item_name.lower():
                             item_id = item.get("_id")
                             break
-                            
+
                     if meal_id and item_id:
                         import requests
                         url = f"https://foodcommittee.iiitb.ac.in/api/user/rating/{meal_id}"
@@ -115,7 +115,7 @@ def submit_food_rating(
                 except Exception as e:
                     pass # Continue to return local success even if external fails
         # ---------------------------------------------
-        
+
         return str(res)
     except Exception as e:
         return f"Failed to submit rating: {e}"

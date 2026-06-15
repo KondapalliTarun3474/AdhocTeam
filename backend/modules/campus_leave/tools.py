@@ -54,7 +54,7 @@ def draft_campus_leave_application(
         profile = _profile_for(DEFAULT_CAMPUS_ID, user_id)
         if not profile:
             return "ERROR: Student profile not found."
-            
+
         # 1. Check for missing data
         if not all([from_date, to_date, destination, reason, emergency_contact]):
             return "ERROR: You are missing required details. You MUST ask the user to provide their exact destination, reason, and an emergency contact."
@@ -99,12 +99,12 @@ def submit_campus_leave_application(
         profile = _profile_for(DEFAULT_CAMPUS_ID, user_id)
         if not profile:
             return "Failed to apply: Student profile not found."
-            
+
         # GUARANTEE: Guardian details are strictly pulled from the database
         guardian_email = profile.guardian_email
         guardian_phone = profile.guardian_phone
         guardian_relation = profile.guardian_relation
-        
+
         # Resolve emergency contact
         resolved_contact = emergency_contact
         if "my number" in str(emergency_contact).lower() or "my phone" in str(emergency_contact).lower():

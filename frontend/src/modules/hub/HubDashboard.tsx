@@ -86,7 +86,7 @@ function HubDashboard({
       <header className="hub-header">
         <div>
           <p className="hub-kicker">AI Operating System for Student Life</p>
-          <h1>CampusBuddy Hub</h1>
+          <h1>campuz Hub</h1>
           <p className="hub-subtitle">
             Notifications, updates, calendar, and plug-in campus modules in one place.
           </p>

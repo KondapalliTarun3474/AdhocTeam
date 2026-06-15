@@ -6,6 +6,7 @@ import HubDashboard from './modules/hub/HubDashboard'
 import HubCalendarPage from './modules/hub/HubCalendarPage'
 import { moduleManifestByKey } from './modules/registry'
 import type { ModuleKey } from './types/campus'
+import campuzLogo from './assets/Campuz_Logo_PNG.png'
 import './App.css'
 
 type HubPageKey = 'hub' | 'hub_calendar' | 'hub_assistant'
@@ -45,8 +46,8 @@ function App() {
     <div className="app app-shell">
       <aside className="app-sidebar" aria-label="Campus modules">
         <div className="app-brand">
-          <span>CampusBuddy</span>
-          <strong>Hub</strong>
+          <img src={campuzLogo} alt="campuz" />
+          <strong>Campus hub</strong>
         </div>
         <nav className="app-nav">
           {NAV_ITEMS.map((item) => (
