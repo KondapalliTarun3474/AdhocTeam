@@ -7,10 +7,9 @@ from modules.menu.schemas import MenuRatingRequest
 @tool
 def get_daily_menu(date: str) -> str:
     """Fetch the campus food menu for a specific date.
-    You MUST provide the date argument in YYYY-MM-DD format. If the user asks for today, pass today's date.
-    Returns a list of food items served for breakfast, lunch, snacks, and dinner.
-    Use this when the user asks what is for lunch or what is on the menu.
-    You must call this tool before submitting any food ratings to find the exact correct spelling of a dish.
+    Data Returned (JSON): date, day_name, and meals (array containing meal_type, start_time, end_time, and items).
+    Use Cases: Use this when the user asks "what is for lunch today?" or "what's on the menu?".
+    Constraints: You MUST provide the date argument in YYYY-MM-DD format. You MUST use this tool to discover the exact correct spelling of a dish BEFORE attempting to submit a food rating.
     """
     try:
         menu = get_menu_for_date(campus_id=DEFAULT_CAMPUS_ID, target_date=date)
@@ -21,8 +20,8 @@ def get_daily_menu(date: str) -> str:
 @tool
 def get_past_food_ratings(user_id: str) -> str:
     """Get all past food ratings (1-5 stars) and comments submitted by this specific user.
-    Returns a historical list of items the user has rated in the past.
-    Use this when the user asks what they rated a dish, or when advising them on whether they should skip a meal by checking if they historically liked or disliked the items currently on today's menu.
+    Data Returned (JSON): array of historical rating objects containing item_name, rating, comment, date, and meal_type.
+    Use Cases: Use this when the user asks what they rated a dish in the past, or proactively when advising them on whether they should skip a meal based on historical preferences.
     """
     try:
         ratings = get_user_food_ratings(user_id=user_id, campus_id=DEFAULT_CAMPUS_ID)
@@ -39,12 +38,12 @@ def submit_food_rating(
     meal_type: str,
     item_name: str,
     rating: str,
-    comment: Optional[str] = None
+    comment: str = ""
 ) -> str:
     """Submit a star rating (1-5) and an optional comment for a specific food item to the database.
-    Creates or updates a rating record in the database.
-    Use this ONLY when the user explicitly asks to rate a food item.
-    You must ask the user for a 1-5 star rating before calling this if they didn't provide one, and you must use the exact item spelling found in get_daily_menu.
+    Data Returned (String): success string or an ERROR message.
+    Use Cases: Use this ONLY when the user explicitly asks to rate a food item.
+    Constraints: You MUST ask the user for a 1-5 star numeric rating before calling this if they didn't provide one. Do NOT infer ratings. You MUST use the exact item spelling found by calling `get_daily_menu` first.
     """
     try:
         # Prevent LLM from guessing strings like "bad" instead of asking the user for a number
