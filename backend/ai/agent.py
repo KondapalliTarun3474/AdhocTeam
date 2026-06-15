@@ -5,13 +5,16 @@ from typing import List, Callable, Dict
 from core.module_registry import discover_modules
 from modules.menu.service import DEFAULT_CAMPUS_ID
 
+import_error_msg = None
 try:
     from langchain.agents import AgentExecutor, create_tool_calling_agent
     from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
     from langchain_groq import ChatGroq
     from langchain_core.chat_history import InMemoryChatMessageHistory
     from langchain_core.runnables.history import RunnableWithMessageHistory
-except ImportError:
+except ImportError as e:
+    import traceback
+    import_error_msg = traceback.format_exc()
     ChatGroq = None
 
 
@@ -43,8 +46,8 @@ def chat_with_agent(
     if not os.environ.get("GROQ_API_KEY") or not ChatGroq:
         import sys
         key_status = "present" if os.environ.get("GROQ_API_KEY") else "MISSING"
-        chatgroq_status = "present" if ChatGroq else "MISSING"
-        return f"DEBUG -> Key: {key_status} | ChatGroq: {chatgroq_status} | Python: {sys.executable} | CWD: {os.getcwd()}"
+        chatgroq_status = "present" if ChatGroq else f"MISSING. Reason:\n{import_error_msg}"
+        return f"DEBUG -> Key: {key_status} | ChatGroq: {chatgroq_status} | Python: {sys.executable}"
 
     try:
         tools = _get_all_tools()
