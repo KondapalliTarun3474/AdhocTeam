@@ -73,7 +73,7 @@ Menu access:
 The Menu module supports two setup modes:
 
 - `external_website`: the campus uses an existing URL, for example `foodcommittee.iiitb.ac.in`.
-- `default_app`: the campus uses CampusBuddy's built-in Menu app.
+- `default_app`: the campus uses campuz's built-in Menu app.
 
 The frontend setup panel lives in `MenuWidget.tsx`. The backend config is served by:
 

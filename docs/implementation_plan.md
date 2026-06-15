@@ -1,8 +1,8 @@
-# CampusBuddy: Modular Hub Architecture
+# campuz: Modular Hub Architecture
 
 ## 1. Product Direction
 
-CampusBuddy is the central hub for student life. The first screen is a dashboard with:
+campuz is the central hub for student life. The first screen is a dashboard with:
 
 - Notifications
 - New updates
@@ -271,7 +271,7 @@ Example paths for Menu:
 Menu module setup supports:
 
 - `external_website`: campus admins add an existing URL such as `foodcommittee.iiitb.ac.in`.
-- `default_app`: campus admins use the built-in CampusBuddy Menu app.
+- `default_app`: campus admins use the built-in campuz Menu app.
 
 The default app includes weekly menu display, per-item ratings, sick meal requests, feedback, Food Committee manual menu edits, and raw `.xlsx` menu import.
 
@@ -297,7 +297,7 @@ Leave Application endpoints:
 - `GET /api/modules/campus-leave/students`
 - `PATCH /api/modules/campus-leave/curfew`
 
-Both campus modules support `external_website` with `https://campus.iiitb.net` and `default_app` with the built-in CampusBuddy experience.
+Both campus modules support `external_website` with `https://campus.iiitb.net` and `default_app` with the built-in campuz experience.
 
 Academic module endpoints:
 

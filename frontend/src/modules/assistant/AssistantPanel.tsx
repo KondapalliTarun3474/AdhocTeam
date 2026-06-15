@@ -56,7 +56,7 @@ function AssistantPanel({ campusId, designations = [], onOpenStandalone, role, u
       <div className="assistant-header">
         <div>
           <span>Assistant</span>
-          <h2>CampusBuddy</h2>
+          <h2>campuz</h2>
         </div>
         <button onClick={onOpenStandalone} type="button">Open</button>
       </div>

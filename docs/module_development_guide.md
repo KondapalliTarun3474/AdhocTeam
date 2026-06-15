@@ -1,4 +1,4 @@
-# CampusBuddy Module Development Guide
+# campuz Module Development Guide
 
 This guide is for agents and teammates building modules from separate devices. Follow it closely to keep modules pluggable and avoid merge conflicts.
 
@@ -559,7 +559,7 @@ Use the screenshot-derived theme variables from `frontend/src/design/theme.css`:
 - `--cb-border`
 - `--cb-muted`
 
-Do not introduce a new palette for individual modules. A module can vary layout, density, and controls, but it should still feel like part of CampusBuddy.
+Do not introduce a new palette for individual modules. A module can vary layout, density, and controls, but it should still feel like part of campuz.
 
 ## Testing A Module
 

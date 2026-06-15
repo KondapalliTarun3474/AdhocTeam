@@ -38,7 +38,7 @@ def chat_with_agent(
     role: str = "student",
 ) -> str:
     """
-    CampusBuddy LangChain Agent using Groq, dynamic tool discovery, and session memory.
+    campuz LangChain Agent using Groq, dynamic tool discovery, and session memory.
     """
     if not os.environ.get("GROQ_API_KEY") or not ChatGroq:
         return "The AI assistant is currently offline because LangChain/Groq is not configured."
@@ -52,7 +52,7 @@ def chat_with_agent(
         current_time_str = current_date_obj.isoformat()
         tomorrow_date_str = (current_date_obj + timedelta(days=1)).strftime('%Y-%m-%d')
         
-        system_prompt = f"""You are CampusBuddy, an intelligent, helpful AI assistant for university students.
+        system_prompt = f"""You are campuz, an intelligent, helpful AI assistant for university students.
 Current Date & Time: {current_time_str}
 Tomorrow's Date: {tomorrow_date_str}
 User ID: {user_id}
@@ -102,5 +102,5 @@ CRITICAL RULES:
         import traceback
         traceback.print_exc()
         if hasattr(e, "failed_generation"):
-            return f"Error connecting to CampusBuddy AI: {str(e)} - Generation: {e.failed_generation}"
-        return f"Error connecting to CampusBuddy AI: {str(e)}"
+            return f"Error connecting to campuz AI: {str(e)} - Generation: {e.failed_generation}"
+        return f"Error connecting to campuz AI: {str(e)}"
