@@ -1,6 +1,6 @@
 .assistant-panel {
   background: var(--cb-ink);
-  border: 1px solid rgba(37, 47, 59, 0.18);
+  border: 1px solid var(--cb-ink);
   border-radius: 8px;
   box-shadow: var(--cb-shadow);
   color: var(--cb-white);
@@ -9,6 +9,13 @@
   min-height: 100%;
   min-width: 0;
   padding: 20px;
+}
+
+.assistant-header {
+  align-items: flex-start;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
 }
 
 .assistant-header span {
@@ -22,6 +29,17 @@
 
 .assistant-header h2 {
   margin: 0 0 16px;
+}
+
+.assistant-header button {
+  background: var(--cb-cyan);
+  border-radius: 6px;
+  color: var(--cb-ink);
+  cursor: pointer;
+  font-size: 0.76rem;
+  font-weight: 900;
+  min-height: 32px;
+  padding: 7px 10px;
 }
 
 .assistant-messages {
@@ -45,8 +63,9 @@
 
 .assistant-message.assistant {
   align-self: flex-start;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: var(--cb-white);
+  border: 1px solid var(--cb-border);
+  color: var(--cb-ink);
 }
 
 .assistant-message.user {

@@ -1,33 +1,42 @@
 import { useMemo, useState } from 'react'
 import { DEFAULT_CAMPUS_ID } from './api/client'
 import { DEFAULT_USER_ID, DEMO_PROFILES } from './accessProfiles'
+import HubAssistantPage from './modules/hub/HubAssistantPage'
 import HubDashboard from './modules/hub/HubDashboard'
+import HubCalendarPage from './modules/hub/HubCalendarPage'
 import { moduleManifestByKey } from './modules/registry'
 import type { ModuleKey } from './types/campus'
 import './App.css'
 
+type HubPageKey = 'hub' | 'hub_calendar' | 'hub_assistant'
+
 const NAV_ITEMS: Array<{
-  key: 'hub' | ModuleKey
+  key: HubPageKey | ModuleKey
   label: string
-  status: 'connected' | 'planned'
+  status: 'connected' | 'planned' | 'hub'
 }> = [
-  { key: 'hub', label: 'Hub', status: 'connected' },
+  { key: 'hub', label: 'Hub', status: 'hub' },
+  { key: 'hub_calendar', label: 'Calendar', status: 'hub' },
+  { key: 'hub_assistant', label: 'AI Chat', status: 'hub' },
   { key: 'menu', label: 'Foode', status: 'connected' },
   { key: 'campus_rooms', label: 'Rooms', status: 'connected' },
   { key: 'campus_leave', label: 'Leave', status: 'connected' },
-  { key: 'lms', label: 'LMS', status: 'planned' },
-  { key: 'erp', label: 'ERP', status: 'planned' },
-  { key: 'exam_lms', label: 'Exam LMS', status: 'planned' },
+  { key: 'erp', label: 'ERP', status: 'connected' },
+  { key: 'lms', label: 'LMS', status: 'connected' },
+  { key: 'exam_lms', label: 'Exam Portal', status: 'connected' },
+  { key: 'announcements', label: 'Announcements', status: 'connected' },
 ]
 
+const HUB_PAGE_KEYS = new Set<string>(['hub', 'hub_calendar', 'hub_assistant'])
+
 function App() {
-  const [activePage, setActivePage] = useState<'hub' | ModuleKey>('hub')
+  const [activePage, setActivePage] = useState<HubPageKey | ModuleKey>('hub')
   const [profileId, setProfileId] = useState('student')
   const activeProfile = useMemo(() => (
     DEMO_PROFILES.find((profile) => profile.id === profileId) ?? DEMO_PROFILES[0]
   ), [profileId])
 
-  const activeModule = activePage === 'hub'
+  const activeModule = HUB_PAGE_KEYS.has(activePage)
     ? null
     : moduleManifestByKey.get(activePage)
   const ActiveModulePage = activeModule?.Page
@@ -58,10 +67,18 @@ function App() {
         {activePage === 'hub' ? (
           <HubDashboard
             activeProfile={activeProfile}
+            onOpenHubPage={(pageKey) => setActivePage(pageKey)}
             onOpenModule={(moduleKey) => setActivePage(moduleKey)}
             onProfileChange={setProfileId}
             profileId={profileId}
           />
+        ) : activePage === 'hub_calendar' ? (
+          <HubCalendarPage
+            activeProfile={activeProfile}
+            onOpenModule={(moduleKey) => setActivePage(moduleKey)}
+          />
+        ) : activePage === 'hub_assistant' ? (
+          <HubAssistantPage activeProfile={activeProfile} />
         ) : ActiveModulePage ? (
           <ActiveModulePage
             campusId={DEFAULT_CAMPUS_ID}

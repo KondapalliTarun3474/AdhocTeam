@@ -392,7 +392,7 @@
 
 .menu-item-button.open {
   background: var(--cb-callout);
-  border-color: rgba(48, 111, 184, 0.28);
+  border-color: var(--cb-blue);
 }
 
 .menu-item-button.completed {

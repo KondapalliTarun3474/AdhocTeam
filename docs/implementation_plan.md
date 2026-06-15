@@ -10,6 +10,8 @@ CampusBuddy is the central hub for student life. The first screen is a dashboard
 - Connected module widgets
 - Assistant chat
 
+The personal calendar and standalone AI chat are Hub-owned surfaces, not separate modules. The Hub dashboard shows glance versions; full-screen/full-page versions live under the Hub route layer.
+
 Individual campus apps are developed as independent modules: Foode/Menu, Campus Room Tracker, Leave Application, LMS, ERP, Exam LMS, and future apps. Each module owns its backend routes, schemas, services, and frontend UI.
 
 The hub is a glance surface. It should show summaries only, such as the next meal from Foode. Full module workflows open as separate pages from the left navigation or from a glance action button.
@@ -61,6 +63,34 @@ backend/
       router.py
       schemas.py
       service.py
+    academics/
+      default_courses.json
+      schemas.py
+      service.py
+    erp/
+      module.py
+      router.py
+      schemas.py
+      service.py
+      tools.py
+    lms/
+      module.py
+      router.py
+      schemas.py
+      service.py
+      tools.py
+    exam_lms/
+      module.py
+      router.py
+      schemas.py
+      service.py
+      tools.py
+    announcements/
+      module.py
+      router.py
+      schemas.py
+      service.py
+      tools.py
   ai/
     agent.py
   main.py
@@ -102,14 +132,48 @@ frontend/src/
       defaultLeave.ts
       manifest.ts
       types.ts
+    academics/
+      catalog.ts
+      defaultCourses.json
+      types.ts
+    erp/
+      ErpGlance.tsx
+      ErpPage.tsx
+      Erp.css
+      api.ts
+      manifest.ts
+      types.ts
+    lms/
+      LmsGlance.tsx
+      LmsPage.tsx
+      Lms.css
+      api.ts
+      manifest.ts
+      types.ts
+    exam_lms/
+      ExamGlance.tsx
+      ExamPage.tsx
+      Exam.css
+      api.ts
+      manifest.ts
+      types.ts
+    announcements/
+      AnnouncementsGlance.tsx
+      AnnouncementsPage.tsx
+      Announcements.css
+      api.ts
+      manifest.ts
+      types.ts
     assistant/
       AssistantPanel.tsx
       AssistantPanel.css
 ```
 
-Rule: a module should not edit another module's folder. Shared contracts belong in `backend/core`, `frontend/src/api`, `frontend/src/types`, or `frontend/src/design`.
+Rule: a module should not edit another module's folder. Shared contracts belong in `backend/core`, `backend/modules/academics`, `frontend/src/api`, `frontend/src/types`, `frontend/src/modules/academics`, or `frontend/src/design`.
 
 Frontend code is TypeScript-first. Shared API and hub contracts live in `frontend/src/types/campus.ts`. Module UI should use `.tsx`, module APIs should use `.ts`, and each module should export a typed `manifest.ts`.
+
+Hub-owned surfaces should not export manifests. Current Hub surfaces are documented in `docs/hub_surfaces.md`.
 
 ## 4. RBAC Model
 
@@ -235,6 +299,19 @@ Leave Application endpoints:
 
 Both campus modules support `external_website` with `https://campus.iiitb.net` and `default_app` with the built-in CampusBuddy experience.
 
+Academic module endpoints:
+
+- `GET /api/modules/erp/workspace`
+- `POST /api/modules/erp/registrations`
+- `DELETE /api/modules/erp/registrations/{course_id}`
+- `GET /api/modules/lms/workspace`
+- `POST /api/modules/lms/submissions`
+- `GET /api/modules/exam-lms/workspace`
+- `GET /api/modules/announcements/workspace`
+- `POST /api/modules/announcements`
+
+The shared timetable catalog lives in `backend/modules/academics/default_courses.json` and `frontend/src/modules/academics/defaultCourses.json`. ERP, LMS, Exam Portal, Room Tracker, Announcements, and future course-aware modules should reuse `course_id`.
+
 ## 6. Hub Integration Pattern
 
 The hub aggregates summaries, not full module logic.
@@ -263,7 +340,9 @@ It returns:
 - `menu`
 - `module_data` for detailed non-core module payloads
 
-Future modules can add their own notifications and calendar events without changing the frontend shell structure. Current connected examples are Campus Room Tracker calendar rows and Leave Application queue notifications.
+Future modules can add their own notifications and calendar events without changing the frontend shell structure. Current connected examples are Campus Room Tracker calendar rows, Leave Application queue notifications, ERP personal calendar rows, LMS assignment notices, Exam Portal quiz notices, and Announcements inbox notices.
+
+The full student calendar is a Hub page that consumes ERP, LMS, and Exam Portal data. It does not own registration, assignment submission, or quiz workflows.
 
 ## 7. Assistant Chain
 
@@ -277,14 +356,20 @@ Current rule:
 
 This keeps the assistant stable while modules are developed separately.
 
-Current basic task:
+Current module tools:
 
-- Menu questions route to `modules.menu.service.format_menu_for_assistant`.
+- Menu questions use menu tools.
+- Room booking questions use room tools.
+- Leave questions use leave tools.
+- Schedule and free-time questions use ERP's `get_personal_academic_calendar`.
+- Assignment questions use LMS's `get_lms_assignments`.
+- Quiz and score questions use Exam Portal's `get_exam_portal_quizzes`.
+- Notice, inbox, opportunity, and event questions use Announcements' `get_campus_announcements`.
 - If `GROQ_API_KEY` or `langchain-groq` is missing, the assistant returns deterministic fallback output.
 
 ## 8. Adding a New Module
 
-To add LMS, ERP, Exam LMS, or another app:
+To add another campus app:
 
 1. Create `backend/modules/<module_key>/`.
 2. Add `schemas.py`, `service.py`, `router.py`, and `module.py`.
@@ -301,6 +386,10 @@ For detailed implementation rules, use `docs/module_development_guide.md` as the
 For Menu-specific setup, Excel import, ratings, sick meals, and feedback behavior, use `docs/menu_module_implementation.md`.
 
 For Campus Room Tracker and Leave Application behavior, use `docs/campus_rooms_leave_modules.md`.
+
+For ERP, LMS, Exam Portal, Announcements, and shared course catalog behavior, use `docs/academic_modules.md`.
+
+For Hub Calendar and standalone Assistant behavior, use `docs/hub_surfaces.md`.
 
 Food Committee CSV upload template:
 

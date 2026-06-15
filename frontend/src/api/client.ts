@@ -7,6 +7,7 @@ import type {
   MenuReview,
   Role,
 } from '../types/campus'
+import { buildPersonalCalendar } from '../modules/academics/catalog'
 
 export const DEFAULT_CAMPUS_ID = '00000000-0000-0000-0000-000000000000'
 
@@ -44,6 +45,20 @@ export function fallbackOverview(
         body: 'Roles are global; Food Committee, TA, Warden, Security, and Classroom Support are designations.',
         priority: 'normal',
       },
+      {
+        id: 'local-course-assignment',
+        module_key: 'lms',
+        title: 'Assignment queue ready',
+        body: 'Registered courses can publish LMS deadlines and PDF submissions.',
+        priority: 'normal',
+      },
+      {
+        id: 'local-announcement',
+        module_key: 'announcements',
+        title: 'Announcement inbox connected',
+        body: 'Course notices, quizzes, results, opportunities, and resources can be filtered in one inbox.',
+        priority: 'normal',
+      },
     ],
     updates: [
       {
@@ -65,6 +80,16 @@ export function fallbackOverview(
         module_key: 'campus_leave',
         title: 'Leave module connected',
         body: 'Students can request leave while Security and Wardens get dedicated views.',
+      },
+      {
+        module_key: 'erp',
+        title: 'Course registration connected',
+        body: 'ERP registration uses the elective timetable and blocks overlapping class slots.',
+      },
+      {
+        module_key: 'exam_lms',
+        title: 'Exam Portal connected',
+        body: 'Quiz windows and released scores are available for registered courses.',
       },
     ],
     calendar: [
@@ -104,27 +129,37 @@ export function fallbackOverview(
       {
         key: 'lms',
         name: 'LMS',
-        status: 'planned',
+        status: 'connected',
         available: ['student', 'professor', 'admin'].includes(role) || hasDesignation('teaching_assistant'),
-        summary: 'Courses, assignments, materials, and TA workflows.',
+        summary: 'Assignments, deadlines, and PDF submissions for registered courses.',
         roles: ['student', 'professor', 'admin'],
         designations: ['teaching_assistant'],
       },
       {
         key: 'erp',
         name: 'ERP',
-        status: 'planned',
-        available: ['student', 'admin'].includes(role),
-        summary: 'Fee receipts, profile records, transport, and services.',
-        roles: ['student', 'admin'],
+        status: 'connected',
+        available: ['student', 'professor', 'admin'].includes(role),
+        summary: 'Elective registration with timetable conflict checks and personal calendar.',
+        roles: ['student', 'professor', 'admin'],
       },
       {
         key: 'exam_lms',
-        name: 'Exam LMS',
-        status: 'planned',
-        available: ['student', 'professor', 'admin'].includes(role),
-        summary: 'Exam schedules, hall tickets, marks, and revaluation updates.',
+        name: 'Exam Portal',
+        status: 'connected',
+        available: ['student', 'professor', 'admin'].includes(role) || hasDesignation('teaching_assistant'),
+        summary: 'Quiz schedule, start and end times, and released scores.',
         roles: ['student', 'professor', 'admin'],
+        designations: ['teaching_assistant'],
+      },
+      {
+        key: 'announcements',
+        name: 'Announcements',
+        status: 'connected',
+        available: ['student', 'professor', 'staff', 'admin'].includes(role),
+        summary: 'Inbox for course notices, quizzes, results, opportunities, events, and resources.',
+        roles: ['student', 'professor', 'staff', 'admin'],
+        designations: ['teaching_assistant'],
       },
     ],
     menu: {
@@ -135,6 +170,26 @@ export function fallbackOverview(
         { meal_type: 'lunch', items: ['Paneer Butter Masala', 'Jeera Rice', 'Dal Tadka', 'Roti'] },
         { meal_type: 'dinner', items: ['Aloo Gobi', 'Dal Makhani', 'Naan', 'Gulab Jamun'] },
       ],
+    },
+    module_data: {
+      personal_calendar: buildPersonalCalendar(),
+      announcements: {
+        unread_count: 6,
+        latest: {
+          title: 'Oracle Hackathon Prep Session',
+          category: 'Hackathons',
+          tag: 'Hackathon',
+        },
+      },
+      erp: {
+        registered_count: 5,
+      },
+      lms: {
+        assignment_count: 5,
+      },
+      exam_lms: {
+        quiz_count: 5,
+      },
     },
   }
 }

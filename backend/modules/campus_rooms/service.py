@@ -3,6 +3,12 @@ from datetime import date, datetime, time, timedelta
 from typing import Any, Dict, List, Optional
 
 from database import get_supabase
+from modules.academics.service import (
+    list_courses as list_academic_courses,
+    list_rooms as list_academic_rooms,
+    list_sessions as list_academic_sessions,
+    session_datetimes,
+)
 from modules.campus_rooms.schemas import (
     CampusRoomsWorkspace,
     CourseSchema,
@@ -74,57 +80,24 @@ def _get_config_json(campus_id: str, supabase: Any = None) -> Dict[str, Any]:
 
 def _seed_rooms(campus_id: str) -> List[RoomSchema]:
     return [
-        RoomSchema(campus_id=campus_id, room_id="r104", room_name="R104", building="Academic Block", floor="1", capacity=72, room_type="Classroom"),
-        RoomSchema(campus_id=campus_id, room_id="r109", room_name="R109", building="Academic Block", floor="1", capacity=90, room_type="Seminar Room"),
-        RoomSchema(campus_id=campus_id, room_id="r1", room_name="R1", building="Main Block", floor="Ground", capacity=45, room_type="Classroom"),
-        RoomSchema(campus_id=campus_id, room_id="r3", room_name="R3", building="Main Block", floor="Ground", capacity=55, room_type="Classroom"),
-        RoomSchema(campus_id=campus_id, room_id="p2", room_name="P2 Lab", building="Lab Block", floor="2", capacity=60, room_type="Lab"),
-        RoomSchema(campus_id=campus_id, room_id="a3", room_name="A3", building="Admin Block", floor="3", capacity=35, room_type="Discussion Room"),
+        RoomSchema(**room.dict())
+        for room in list_academic_rooms(campus_id)
     ]
 
 
 def _seed_courses(campus_id: str) -> List[CourseSchema]:
     return [
         CourseSchema(
-            campus_id=campus_id,
-            course_id="ph201",
-            course_code="PH201",
-            course_name="Nagalakshmi S. R.",
-            term="Summer 2026",
-            professor_id="prof-nagalakshmi",
-            professor_name="Prof. Nagalakshmi S. R.",
-            department="Science",
-        ),
-        CourseSchema(
-            campus_id=campus_id,
-            course_id="bio901",
-            course_code="BIO901",
-            course_name="Imaginate Bootcamp",
-            term="Summer 2026",
-            professor_id="prof-kondapalli",
-            professor_name="Prof. Kondapalli",
-            department="Interdisciplinary",
-        ),
-        CourseSchema(
-            campus_id=campus_id,
-            course_id="ds501",
-            course_code="DS501",
-            course_name="Data Systems Studio",
-            term="Summer 2026",
-            professor_id="prof-asha",
-            professor_name="Prof. Asha",
-            department="Computer Science",
-        ),
-        CourseSchema(
-            campus_id=campus_id,
-            course_id="ml302",
-            course_code="ML302",
-            course_name="Machine Learning",
-            term="Summer 2026",
-            professor_id="prof-mehra",
-            professor_name="Prof. Mehra",
-            department="Computer Science",
-        ),
+            campus_id=course.campus_id,
+            course_id=course.course_id,
+            course_code=course.course_code,
+            course_name=course.course_name,
+            term=course.term,
+            professor_id=course.professor_id,
+            professor_name=course.professor_name,
+            department=course.department,
+        )
+        for course in list_academic_courses(campus_id)
     ]
 
 
@@ -137,59 +110,29 @@ def _room_lookup(campus_id: str) -> Dict[str, RoomSchema]:
 
 
 def _seed_bookings(campus_id: str) -> List[RoomBookingRecord]:
-    start = _week_start()
-    course_by_id = _course_lookup(campus_id)
-
-    def class_booking(
-        room_id: str,
-        room_name: str,
-        course_id: str,
-        day_offset: int,
-        start_hour: int,
-        start_minute: int,
-        end_hour: int,
-        end_minute: int,
-        title: Optional[str] = None,
-    ) -> RoomBookingRecord:
-        course = course_by_id[course_id]
-        current_day = start + timedelta(days=day_offset)
-        return RoomBookingRecord(
-            id=str(uuid.uuid4()),
-            campus_id=campus_id,
-            room_id=room_id,
-            room_name=room_name,
-            title=title or f"{course.course_code} - {course.course_name}",
-            booking_type=RoomBookingType.CLASS,
-            start_at=_at(current_day, start_hour, start_minute),
-            end_at=_at(current_day, end_hour, end_minute),
-            course_id=course.course_id,
-            course_code=course.course_code,
-            course_name=course.course_name,
-            professor_id=course.professor_id,
-            professor_name=course.professor_name,
-            created_by="seed",
+    bookings = []
+    for session in list_academic_sessions(campus_id):
+        start_at, end_at = session_datetimes(session)
+        bookings.append(
+            RoomBookingRecord(
+                id=f"class-{session.session_id}",
+                campus_id=campus_id,
+                room_id=session.room_id,
+                room_name=session.room_name,
+                title=session.title,
+                booking_type=RoomBookingType.CLASS,
+                start_at=start_at,
+                end_at=end_at,
+                course_id=session.course_id,
+                course_code=session.course_code,
+                course_name=session.course_name,
+                professor_id=session.professor_id,
+                professor_name=session.professor_name,
+                created_by="timetable",
+                notes="Tutorial" if session.is_tutorial else None,
+            )
         )
-
-    return [
-        class_booking("p2", "P2 Lab", "ds501", 0, 9, 0, 17, 0),
-        class_booking("r1", "R1", "ml302", 0, 11, 0, 13, 0),
-        class_booking("r3", "R3", "ml302", 0, 14, 0, 16, 0),
-        class_booking("r104", "R104", "ph201", 1, 12, 30, 16, 0, "R104 - Thesis Oral Exam"),
-        class_booking("r109", "R109", "bio901", 5, 10, 0, 17, 0, "R109 - Imaginate Bootcamp"),
-        RoomBookingRecord(
-            id=str(uuid.uuid4()),
-            campus_id=campus_id,
-            room_id="a3",
-            room_name="A3",
-            title="Classroom maintenance block",
-            booking_type=RoomBookingType.BLOCK,
-            start_at=_at(start + timedelta(days=2), 9, 0),
-            end_at=_at(start + timedelta(days=2), 10, 0),
-            status="blocked",
-            created_by="classroom-support",
-            notes="Projector repair",
-        ),
-    ]
+    return bookings
 
 
 def get_config(campus_id: str = DEFAULT_CAMPUS_ID, supabase: Any = None) -> RoomSetupConfig:
