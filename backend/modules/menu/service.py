@@ -786,7 +786,8 @@ def save_rating(rating: MenuRatingRequest, supabase: Any) -> Dict[str, Any]:
             )
             .execute()
         )
-        return {"status": "success", "data": response.data}
+        saved = response.data[0] if response.data else row
+        return {"status": "success", "data": saved}
     except Exception:
         return {"status": "preview", "data": row}
 
@@ -866,7 +867,8 @@ def save_sick_meal(request: SickMealRequest, supabase: Any) -> Dict[str, Any]:
 
     try:
         response = supabase.table("menu_sick_meals").insert(record.dict()).execute()
-        return {"status": "success", "data": response.data}
+        saved = response.data[0] if response.data else record.dict()
+        return {"status": "success", "data": saved}
     except Exception:
         return {"status": "preview", "data": record.dict()}
 
@@ -918,7 +920,8 @@ def save_feedback(request: MenuFeedbackRequest, supabase: Any) -> Dict[str, Any]
 
     try:
         response = supabase.table("menu_feedback").insert(record.dict()).execute()
-        return {"status": "success", "data": response.data}
+        saved = response.data[0] if response.data else record.dict()
+        return {"status": "success", "data": saved}
     except Exception:
         return {"status": "preview", "data": record.dict()}
 

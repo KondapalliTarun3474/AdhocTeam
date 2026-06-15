@@ -72,10 +72,75 @@ function normalizeTimings(rawTimings: unknown): MenuMealTiming[] {
   return timings.length > 0 ? timings : DEFAULT_MEAL_TIMINGS
 }
 
-function normalizeWorkspace(workspace: MenuWorkspace): MenuWorkspace {
+function firstPayload<T>(data: unknown): T | undefined {
+  if (Array.isArray(data)) {
+    return data[0] as T | undefined
+  }
+  if (data && typeof data === 'object') {
+    return data as T
+  }
+  return undefined
+}
+
+function normalizeStatus<T>(response: ApiStatus<unknown>, fallback: T): ApiStatus<T> {
   return {
-    ...workspace,
+    status: response.status,
+    data: firstPayload<T>(response.data) ?? fallback,
+    message: response.message,
+  }
+}
+
+function normalizeWeeklyMenu(rawMenu: unknown, campusId: string): WeeklyMenu {
+  const fallback = buildSampleWeeklyMenu(campusId)
+  if (!rawMenu || typeof rawMenu !== 'object') return fallback
+
+  const menu = rawMenu as Partial<WeeklyMenu>
+  const days = Array.isArray(menu.days)
+    ? menu.days.map((day, index) => ({
+      date: typeof day?.date === 'string' ? day.date : fallback.days[index]?.date ?? fallback.week_start,
+      day_name: typeof day?.day_name === 'string' ? day.day_name : fallback.days[index]?.day_name ?? 'Day',
+      meals: Array.isArray(day?.meals)
+        ? day.meals.map((meal) => ({
+          meal_type: meal?.meal_type ?? 'lunch',
+          items: Array.isArray(meal?.items) ? meal.items.filter((item): item is string => typeof item === 'string') : [],
+        }))
+        : [],
+    }))
+    : fallback.days
+
+  return {
+    campus_id: typeof menu.campus_id === 'string' ? menu.campus_id : campusId,
+    week_start: typeof menu.week_start === 'string' ? menu.week_start : fallback.week_start,
+    days,
+    imported_from: menu.imported_from,
+    last_updated_at: menu.last_updated_at,
+  }
+}
+
+function normalizeConfig(rawConfig: unknown, campusId: string): MenuSetupConfig {
+  const fallback = fallbackConfig(campusId)
+  if (!rawConfig || typeof rawConfig !== 'object') return fallback
+  const config = rawConfig as Partial<MenuSetupConfig>
+  return {
+    ...fallback,
+    ...config,
+    campus_id: typeof config.campus_id === 'string' ? config.campus_id : campusId,
+    module_key: 'menu',
+    mode: config.mode === 'external_website' ? 'external_website' : 'default_app',
+    is_active: typeof config.is_active === 'boolean' ? config.is_active : fallback.is_active,
+  }
+}
+
+function normalizeWorkspace(workspace: Partial<MenuWorkspace>, campusId: string): MenuWorkspace {
+  return {
+    config: normalizeConfig(workspace.config, campusId),
+    weekly_menu: normalizeWeeklyMenu(workspace.weekly_menu, campusId),
+    ratings: Array.isArray(workspace.ratings) ? workspace.ratings.filter((item): item is MenuRating => Boolean(item && typeof item === 'object' && 'item_name' in item)) : [],
+    rating_summary: Array.isArray(workspace.rating_summary) ? workspace.rating_summary : [],
+    sick_meals: Array.isArray(workspace.sick_meals) ? workspace.sick_meals.filter((item): item is SickMealRecord => Boolean(item && typeof item === 'object' && 'id' in item)) : [],
+    feedback: Array.isArray(workspace.feedback) ? workspace.feedback.filter((item): item is MenuFeedbackRecord => Boolean(item && typeof item === 'object' && 'id' in item)) : [],
     meal_timings: normalizeTimings(workspace.meal_timings),
+    reminder: workspace.reminder ?? null,
   }
 }
 
@@ -149,7 +214,7 @@ export async function fetchMenuWorkspace(
       role,
       designations,
     })
-    return normalizeWorkspace(workspace)
+    return normalizeWorkspace(workspace, campusId)
   } catch (error) {
     return fallbackWorkspace(campusId)
   }
@@ -187,7 +252,7 @@ export async function saveMenuConfig(
   designations: Designation[],
 ): Promise<ApiStatus<MenuSetupConfig>> {
   try {
-    return await menuRequest<ApiStatus<MenuSetupConfig>>('/api/modules/menu/config', {
+    const response = await menuRequest<ApiStatus<unknown>>('/api/modules/menu/config', {
       method: 'PUT',
       role,
       designations,
@@ -198,6 +263,7 @@ export async function saveMenuConfig(
         is_active: config.is_active,
       },
     })
+    return normalizeStatus(response, config)
   } catch (error) {
     return { status: 'preview', data: config }
   }
@@ -209,12 +275,13 @@ export async function saveWeeklyMenu(
   designations: Designation[],
 ): Promise<ApiStatus<WeeklyMenu>> {
   try {
-    return await menuRequest<ApiStatus<WeeklyMenu>>('/api/modules/menu/week', {
+    const response = await menuRequest<ApiStatus<unknown>>('/api/modules/menu/week', {
       method: 'PUT',
       role,
       designations,
       body: weeklyMenu,
     })
+    return normalizeStatus(response, weeklyMenu)
   } catch (error) {
     return { status: 'preview', data: weeklyMenu }
   }
@@ -259,12 +326,13 @@ export async function submitMenuRating(
   designations: Designation[],
 ): Promise<ApiStatus<MenuRating>> {
   try {
-    return await menuRequest<ApiStatus<MenuRating>>('/api/modules/menu/ratings', {
+    const response = await menuRequest<ApiStatus<unknown>>('/api/modules/menu/ratings', {
       method: 'POST',
       role,
       designations,
       body: rating,
     })
+    return normalizeStatus(response, rating)
   } catch (error) {
     return { status: 'preview', data: rating }
   }
@@ -275,15 +343,17 @@ export async function submitSickMeal(
   role: Role,
   designations: Designation[],
 ): Promise<ApiStatus<SickMealRecord>> {
+  const fallback = { ...request, id: crypto.randomUUID(), status: 'requested', created_at: new Date().toISOString() }
   try {
-    return await menuRequest<ApiStatus<SickMealRecord>>('/api/modules/menu/sick-meals', {
+    const response = await menuRequest<ApiStatus<unknown>>('/api/modules/menu/sick-meals', {
       method: 'POST',
       role,
       designations,
       body: request,
     })
+    return normalizeStatus(response, fallback)
   } catch (error) {
-    return { status: 'preview', data: { ...request, id: crypto.randomUUID(), status: 'requested', created_at: new Date().toISOString() } }
+    return { status: 'preview', data: fallback }
   }
 }
 
@@ -292,14 +362,16 @@ export async function submitMenuFeedback(
   role: Role,
   designations: Designation[],
 ): Promise<ApiStatus<MenuFeedbackRecord>> {
+  const fallback = { ...request, id: crypto.randomUUID(), status: 'open', created_at: new Date().toISOString() }
   try {
-    return await menuRequest<ApiStatus<MenuFeedbackRecord>>('/api/modules/menu/feedback', {
+    const response = await menuRequest<ApiStatus<unknown>>('/api/modules/menu/feedback', {
       method: 'POST',
       role,
       designations,
       body: request,
     })
+    return normalizeStatus(response, fallback)
   } catch (error) {
-    return { status: 'preview', data: { ...request, id: crypto.randomUUID(), status: 'open', created_at: new Date().toISOString() } }
+    return { status: 'preview', data: fallback }
   }
 }

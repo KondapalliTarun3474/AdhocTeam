@@ -118,12 +118,38 @@ CREATE TABLE IF NOT EXISTS campus_courses (
     course_id TEXT NOT NULL,
     course_code TEXT NOT NULL,
     course_name TEXT NOT NULL,
+    course_label TEXT,
     term TEXT NOT NULL,
     professor_id TEXT NOT NULL,
     professor_name TEXT NOT NULL,
+    instructors JSONB DEFAULT '[]'::jsonb,
     department TEXT,
+    credits INT DEFAULT 0,
+    room TEXT,
+    raw_timings TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     UNIQUE(campus_id, course_id)
+);
+
+CREATE TABLE IF NOT EXISTS campus_course_sessions (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    campus_id UUID NOT NULL,
+    session_id TEXT NOT NULL,
+    course_id TEXT NOT NULL,
+    course_code TEXT NOT NULL,
+    course_name TEXT NOT NULL,
+    professor_id TEXT NOT NULL,
+    professor_name TEXT NOT NULL,
+    day VARCHAR(20) NOT NULL,
+    day_index INT NOT NULL,
+    start_time TEXT NOT NULL,
+    end_time TEXT NOT NULL,
+    room_id TEXT NOT NULL,
+    room_name TEXT NOT NULL,
+    session_type TEXT DEFAULT 'class',
+    is_tutorial BOOLEAN DEFAULT false,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    UNIQUE(campus_id, session_id)
 );
 
 CREATE TABLE IF NOT EXISTS campus_rooms (
@@ -202,6 +228,84 @@ CREATE TABLE IF NOT EXISTS campus_leave_applications (
     security_notes TEXT
 );
 
+CREATE TABLE IF NOT EXISTS erp_course_registrations (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    campus_id UUID NOT NULL,
+    user_id TEXT NOT NULL,
+    course_id TEXT NOT NULL,
+    registered_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    UNIQUE(campus_id, user_id, course_id)
+);
+
+CREATE TABLE IF NOT EXISTS lms_assignments (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    campus_id UUID NOT NULL,
+    course_id TEXT NOT NULL,
+    course_code TEXT NOT NULL,
+    course_name TEXT NOT NULL,
+    title TEXT NOT NULL,
+    description TEXT,
+    deadline_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    created_by TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS lms_assignment_submissions (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    campus_id UUID NOT NULL,
+    assignment_id TEXT NOT NULL,
+    course_id TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+    filename TEXT NOT NULL,
+    content_type TEXT NOT NULL,
+    size_bytes INT DEFAULT 0,
+    submitted_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    status VARCHAR(40) DEFAULT 'submitted'
+);
+
+CREATE TABLE IF NOT EXISTS exam_quizzes (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    campus_id UUID NOT NULL,
+    course_id TEXT NOT NULL,
+    course_code TEXT NOT NULL,
+    course_name TEXT NOT NULL,
+    title TEXT NOT NULL,
+    start_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    end_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    room_name TEXT,
+    status VARCHAR(40) DEFAULT 'scheduled'
+);
+
+CREATE TABLE IF NOT EXISTS exam_quiz_scores (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    campus_id UUID NOT NULL,
+    quiz_id TEXT NOT NULL,
+    course_id TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+    score NUMERIC,
+    max_score NUMERIC DEFAULT 100,
+    released BOOLEAN DEFAULT false,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    UNIQUE(campus_id, quiz_id, user_id)
+);
+
+CREATE TABLE IF NOT EXISTS campus_announcements (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    campus_id UUID NOT NULL,
+    title TEXT NOT NULL,
+    body TEXT NOT NULL,
+    category TEXT NOT NULL,
+    tag TEXT NOT NULL,
+    course_id TEXT,
+    course_code TEXT,
+    course_name TEXT,
+    created_by TEXT NOT NULL,
+    created_by_name TEXT NOT NULL,
+    audience TEXT DEFAULT 'students',
+    priority VARCHAR(20) DEFAULT 'normal',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- Indexes for fast module and assistant querying
 CREATE INDEX IF NOT EXISTS idx_meals_campus_date ON meals(campus_id, date);
 CREATE INDEX IF NOT EXISTS idx_user_roles_lookup ON user_roles(campus_id, user_id, module_key);
@@ -212,7 +316,14 @@ CREATE INDEX IF NOT EXISTS idx_menu_item_ratings_lookup ON menu_item_ratings(cam
 CREATE INDEX IF NOT EXISTS idx_menu_sick_meals_lookup ON menu_sick_meals(campus_id, date, status);
 CREATE INDEX IF NOT EXISTS idx_menu_feedback_lookup ON menu_feedback(campus_id, status, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_campus_courses_lookup ON campus_courses(campus_id, course_id);
+CREATE INDEX IF NOT EXISTS idx_campus_course_sessions_lookup ON campus_course_sessions(campus_id, course_id, day_index, start_time);
 CREATE INDEX IF NOT EXISTS idx_campus_rooms_lookup ON campus_rooms(campus_id, room_id);
 CREATE INDEX IF NOT EXISTS idx_campus_room_bookings_calendar ON campus_room_bookings(campus_id, start_at, end_at);
 CREATE INDEX IF NOT EXISTS idx_campus_student_profiles_rooms ON campus_student_profiles(campus_id, hostel, room_number);
 CREATE INDEX IF NOT EXISTS idx_campus_leave_lookup ON campus_leave_applications(campus_id, user_id, status, from_date);
+CREATE INDEX IF NOT EXISTS idx_erp_course_registrations_lookup ON erp_course_registrations(campus_id, user_id, course_id);
+CREATE INDEX IF NOT EXISTS idx_lms_assignments_lookup ON lms_assignments(campus_id, course_id, deadline_at);
+CREATE INDEX IF NOT EXISTS idx_lms_submissions_lookup ON lms_assignment_submissions(campus_id, user_id, assignment_id);
+CREATE INDEX IF NOT EXISTS idx_exam_quizzes_lookup ON exam_quizzes(campus_id, course_id, start_at);
+CREATE INDEX IF NOT EXISTS idx_exam_scores_lookup ON exam_quiz_scores(campus_id, user_id, quiz_id);
+CREATE INDEX IF NOT EXISTS idx_campus_announcements_lookup ON campus_announcements(campus_id, category, tag, created_at DESC);

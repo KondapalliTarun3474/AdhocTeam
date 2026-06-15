@@ -1,0 +1,205 @@
+.erp-page,
+.erp-glance {
+  background: var(--cb-white);
+  border: 1px solid var(--cb-border);
+  border-radius: 8px;
+  box-shadow: var(--cb-shadow);
+}
+
+.app-content > .erp-page {
+  margin: 28px auto 44px;
+  padding: 20px;
+  width: min(1240px, calc(100% - 40px));
+}
+
+.erp-glance {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+}
+
+.erp-page-header,
+.erp-glance-header {
+  align-items: flex-start;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.erp-glance-header {
+  margin-bottom: 0;
+}
+
+.erp-page-header span,
+.erp-glance-header span,
+.erp-glance-body span,
+.erp-course-card span,
+.erp-section-heading span {
+  color: var(--cb-cyan);
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 900;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.erp-page-header h2,
+.erp-glance-header h2,
+.erp-glance-body h3,
+.erp-course-card h3,
+.erp-section-heading h3 {
+  color: var(--cb-ink);
+  margin: 0;
+}
+
+.erp-page-header strong,
+.erp-glance-header strong {
+  background: var(--cb-callout);
+  border-radius: 999px;
+  color: var(--cb-blue);
+  font-size: 0.78rem;
+  padding: 7px 10px;
+}
+
+.erp-glance-body,
+.erp-toolbar,
+.erp-registered,
+.erp-course-card {
+  background: var(--cb-paper);
+  border: 1px solid var(--cb-border);
+  border-radius: 8px;
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+}
+
+.erp-glance-body h3 {
+  color: var(--cb-orange);
+  font-size: 1.05rem;
+}
+
+.erp-glance-body p,
+.erp-empty,
+.erp-course-card p,
+.erp-course-card em,
+.erp-registered p {
+  color: var(--cb-muted);
+  font-style: normal;
+  margin: 0;
+}
+
+.erp-glance button,
+.erp-course-card button {
+  background: var(--cb-blue);
+  border-radius: 6px;
+  color: var(--cb-white);
+  cursor: pointer;
+  font-weight: 900;
+  min-height: 40px;
+  padding: 9px 12px;
+}
+
+.erp-course-card button.registered {
+  background: var(--cb-orange);
+}
+
+.erp-toolbar {
+  margin-bottom: 14px;
+}
+
+.erp-toolbar label {
+  color: var(--cb-ink);
+  display: grid;
+  font-size: 0.82rem;
+  font-weight: 850;
+  gap: 6px;
+}
+
+.erp-toolbar select {
+  background: var(--cb-white);
+  border: 1px solid var(--cb-border);
+  border-radius: 6px;
+  min-height: 40px;
+  padding: 9px 11px;
+}
+
+.erp-registered {
+  margin-bottom: 14px;
+}
+
+.erp-calendar-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.erp-calendar-item {
+  border: 1px solid var(--cb-border);
+  border-left: 4px solid var(--cb-blue);
+  border-radius: 8px;
+  display: grid;
+  gap: 4px;
+  min-width: 180px;
+  padding: 10px 12px;
+}
+
+.erp-calendar-item.orange {
+  border-left-color: var(--cb-orange);
+}
+
+.erp-calendar-item.cyan {
+  border-left-color: var(--cb-cyan);
+}
+
+.erp-calendar-item.ink {
+  border-left-color: var(--cb-ink);
+}
+
+.erp-calendar-item strong {
+  color: var(--cb-blue);
+  font-size: 0.78rem;
+}
+
+.erp-calendar-item span {
+  color: var(--cb-ink);
+  font-size: 0.84rem;
+  font-weight: 850;
+}
+
+.erp-course-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.erp-course-card h3 {
+  color: var(--cb-orange);
+}
+
+.erp-course-card strong {
+  color: var(--cb-blue);
+  font-size: 0.8rem;
+}
+
+.erp-status {
+  color: var(--cb-blue);
+  font-weight: 850;
+}
+
+@media (max-width: 980px) {
+  .erp-course-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .erp-course-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .erp-page-header {
+    align-items: flex-start;
+    display: grid;
+  }
+}

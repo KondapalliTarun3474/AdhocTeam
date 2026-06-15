@@ -7,6 +7,7 @@ import './AssistantPanel.css'
 interface AssistantPanelProps {
   campusId: string
   designations?: Designation[]
+  onOpenStandalone?: () => void
   role: Role
   userId: string
 }
@@ -16,7 +17,7 @@ type AssistantMessage = {
   content: string
 }
 
-function AssistantPanel({ campusId, designations = [], role, userId }: AssistantPanelProps) {
+function AssistantPanel({ campusId, designations = [], onOpenStandalone, role, userId }: AssistantPanelProps) {
   const [messages, setMessages] = useState<AssistantMessage[]>([
     {
       role: 'assistant',
@@ -53,8 +54,11 @@ function AssistantPanel({ campusId, designations = [], role, userId }: Assistant
   return (
     <section className="assistant-panel" aria-label="Campus assistant">
       <div className="assistant-header">
-        <span>Assistant</span>
-        <h2>CampusBuddy</h2>
+        <div>
+          <span>Assistant</span>
+          <h2>CampusBuddy</h2>
+        </div>
+        <button onClick={onOpenStandalone} type="button">Open</button>
       </div>
 
       <div className="assistant-messages">

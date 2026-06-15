@@ -1,0 +1,216 @@
+.announcements-page,
+.announcements-glance {
+  background: var(--cb-white);
+  border: 1px solid var(--cb-border);
+  border-radius: 8px;
+  box-shadow: var(--cb-shadow);
+  min-width: 0;
+}
+
+.app-content > .announcements-page {
+  margin: 28px auto 44px;
+  padding: 20px;
+  width: min(1240px, calc(100% - 40px));
+}
+
+.announcements-glance {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+}
+
+.announcements-page-header,
+.announcements-glance-header {
+  align-items: flex-start;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.announcements-glance-header {
+  margin-bottom: 0;
+}
+
+.announcements-page-header span,
+.announcements-glance-header span,
+.announcements-glance-body span,
+.announcements-card span {
+  color: var(--cb-cyan);
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 900;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.announcements-page-header h2,
+.announcements-glance-header h2,
+.announcements-glance-body h3,
+.announcements-card h3 {
+  color: var(--cb-ink);
+  margin: 0;
+}
+
+.announcements-page-header strong,
+.announcements-glance-header strong {
+  background: var(--cb-callout);
+  border-radius: 999px;
+  color: var(--cb-blue);
+  font-size: 0.78rem;
+  padding: 7px 10px;
+  white-space: nowrap;
+}
+
+.announcements-glance-body,
+.announcements-toolbar,
+.announcements-composer,
+.announcements-card {
+  background: var(--cb-paper);
+  border: 1px solid var(--cb-border);
+  border-radius: 8px;
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+}
+
+.announcements-glance-body,
+.announcements-card {
+  border-left: 4px solid var(--cb-blue);
+}
+
+.announcements-glance-body.priority-high,
+.announcements-card.priority-high {
+  border-left-color: var(--cb-orange);
+}
+
+.announcements-glance-body.priority-low,
+.announcements-card.priority-low {
+  border-left-color: var(--cb-cyan);
+}
+
+.announcements-glance-body h3 {
+  color: var(--cb-orange);
+  font-size: 1.05rem;
+}
+
+.announcements-glance-body p,
+.announcements-card p,
+.announcements-card em,
+.announcements-empty {
+  color: var(--cb-muted);
+  font-style: normal;
+  margin: 0;
+}
+
+.announcements-glance button,
+.announcements-composer button {
+  background: var(--cb-blue);
+  border-radius: 6px;
+  color: var(--cb-white);
+  cursor: pointer;
+  font-weight: 900;
+  min-height: 42px;
+  padding: 10px 14px;
+}
+
+.announcements-toolbar,
+.announcements-composer {
+  margin-bottom: 14px;
+}
+
+.announcements-toolbar {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.announcements-composer-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.announcements-toolbar label,
+.announcements-composer label {
+  color: var(--cb-ink);
+  display: grid;
+  font-size: 0.82rem;
+  font-weight: 850;
+  gap: 6px;
+}
+
+.announcements-toolbar select,
+.announcements-composer select,
+.announcements-composer input,
+.announcements-composer textarea {
+  background: var(--cb-white);
+  border: 1px solid var(--cb-border);
+  border-radius: 6px;
+  color: var(--cb-ink);
+  min-height: 40px;
+  padding: 9px 11px;
+  width: 100%;
+}
+
+.announcements-composer textarea {
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.announcements-list {
+  display: grid;
+  gap: 12px;
+}
+
+.announcements-card {
+  align-items: flex-start;
+  grid-template-columns: minmax(0, 1fr) minmax(190px, 0.3fr);
+}
+
+.announcements-card aside {
+  display: grid;
+  gap: 8px;
+  justify-items: end;
+  text-align: right;
+}
+
+.announcements-card aside strong {
+  color: var(--cb-orange);
+  font-size: 0.9rem;
+}
+
+.announcements-card aside time {
+  color: var(--cb-muted);
+  font-size: 0.78rem;
+}
+
+.announcements-card aside b {
+  background: var(--cb-callout);
+  border-radius: 999px;
+  color: var(--cb-blue);
+  font-size: 0.78rem;
+  padding: 7px 9px;
+}
+
+.announcements-status {
+  color: var(--cb-blue);
+  font-weight: 850;
+}
+
+@media (max-width: 900px) {
+  .announcements-toolbar,
+  .announcements-composer-grid,
+  .announcements-card {
+    grid-template-columns: 1fr;
+  }
+
+  .announcements-card aside {
+    justify-items: start;
+    text-align: left;
+  }
+}
+
+@media (max-width: 640px) {
+  .announcements-page-header {
+    display: grid;
+  }
+}

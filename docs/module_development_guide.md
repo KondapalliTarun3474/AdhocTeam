@@ -63,6 +63,8 @@ The refactor helps because:
 - Shared RBAC stays centralized while module workflows stay isolated.
 - Future module work should rarely touch `backend/main.py`, `frontend/src/App.tsx`, or the hub shell.
 
+Exception: Personal Calendar and standalone AI Chat are Hub-owned surfaces, not modules. Do not create `frontend/src/modules/calendar/manifest.ts` or `frontend/src/modules/chat/manifest.ts` for them.
+
 ## Current Directory Structure
 
 ```text
@@ -101,6 +103,39 @@ backend/
       router.py
       schemas.py
       service.py
+    academics/
+      __init__.py
+      default_courses.json
+      schemas.py
+      service.py
+    erp/
+      __init__.py
+      module.py
+      router.py
+      schemas.py
+      service.py
+      tools.py
+    lms/
+      __init__.py
+      module.py
+      router.py
+      schemas.py
+      service.py
+      tools.py
+    exam_lms/
+      __init__.py
+      module.py
+      router.py
+      schemas.py
+      service.py
+      tools.py
+    announcements/
+      __init__.py
+      module.py
+      router.py
+      schemas.py
+      service.py
+      tools.py
   database.py
   main.py
   requirements.txt
@@ -131,6 +166,11 @@ frontend/src/
     hub/
       HubDashboard.css
       HubDashboard.tsx
+      HubCalendarPage.css
+      HubCalendarPage.tsx
+      HubAssistantPage.css
+      HubAssistantPage.tsx
+      hubCalendar.ts
     menu/
       api.ts
       defaultMenu.ts
@@ -157,6 +197,38 @@ frontend/src/
       defaultLeave.ts
       manifest.ts
       types.ts
+    academics/
+      catalog.ts
+      defaultCourses.json
+      types.ts
+    erp/
+      api.ts
+      Erp.css
+      ErpGlance.tsx
+      ErpPage.tsx
+      manifest.ts
+      types.ts
+    lms/
+      api.ts
+      Lms.css
+      LmsGlance.tsx
+      LmsPage.tsx
+      manifest.ts
+      types.ts
+    exam_lms/
+      api.ts
+      Exam.css
+      ExamGlance.tsx
+      ExamPage.tsx
+      manifest.ts
+      types.ts
+    announcements/
+      Announcements.css
+      AnnouncementsGlance.tsx
+      AnnouncementsPage.tsx
+      api.ts
+      manifest.ts
+      types.ts
   types/
     campus.ts
   App.css
@@ -177,6 +249,7 @@ backend/modules/lms/
   router.py
   schemas.py
   service.py
+  tools.py                  # optional assistant tools
   default_lms.json        # optional static MVP data
 
 frontend/src/modules/lms/
@@ -198,6 +271,7 @@ Use lowercase snake case for module folders and keys:
 - `lms`
 - `erp`
 - `exam_lms`
+- `announcements`
 
 Use PascalCase for React components:
 
@@ -206,6 +280,8 @@ Use PascalCase for React components:
 - `LmsPage`
 - `ExamLmsGlance`
 - `ExamLmsPage`
+- `AnnouncementsGlance`
+- `AnnouncementsPage`
 
 ## Backend Module Contract
 
@@ -262,6 +338,7 @@ Recommended backend ownership:
 - `service.py`: business logic, Supabase reads/writes, static JSON parsing.
 - `router.py`: FastAPI routes, validation, RBAC dependencies.
 - `module.py`: `CampusModule` metadata and optional hub provider.
+- `tools.py`: optional LangChain tools exported through `CampusModule(agent_tools=...)`.
 - `default_<module>.json`: optional MVP seed/mock data.
 
 ## Backend Router Pattern
@@ -332,7 +409,7 @@ Do not key shared campus data by `user_id` unless the data is truly user-specifi
 
 For now, schema changes go in `backend/schema.sql`. Keep table names module-prefixed when there is a chance of collision, such as `lms_assignments`, `exam_lms_slots`, or `campus_leave_applications`.
 
-Use shared campus-level tables only when the data will be reused by multiple modules. Current example: `campus_courses` is intentionally shared because Room Tracker, LMS, and Exam LMS will all need stable course IDs.
+Use shared campus-level tables only when the data will be reused by multiple modules. Current example: `campus_courses` and `campus_course_sessions` are intentionally shared because Room Tracker, ERP, LMS, Exam Portal, and Announcements all need stable course IDs.
 
 ## Frontend Module Contract
 
@@ -452,18 +529,18 @@ The hub service merges module-specific `notifications`, `updates`, `calendar`, a
 
 ## Assistant Integration
 
-The assistant is intentionally simple right now:
+The assistant is intentionally modular:
 
-- `backend/ai/agent.py` routes by keyword.
-- Module services fetch data.
+- `backend/ai/agent.py` discovers tools from module manifests.
+- Module services fetch data and tools format bounded responses.
 - LangChain only formats the module data.
 - If `GROQ_API_KEY` is missing, deterministic fallback responses are used.
 
 When adding assistant support for a module:
 
-1. Add a small formatter in the module service, such as `format_lms_for_assistant`.
-2. Import that formatter in `backend/ai/agent.py`.
-3. Add a narrow keyword route.
+1. Add a narrow tool in `backend/modules/<module_key>/tools.py`.
+2. Export a list such as `LMS_TOOLS`.
+3. Attach that list to `CampusModule(agent_tools=...)` in `module.py`.
 4. Keep the prompt grounded in raw module data.
 5. Do not let the chain directly query Supabase tables.
 
@@ -490,7 +567,7 @@ Backend:
 
 ```bash
 cd backend
-python3 -m compileall ai core modules main.py database.py test_agent.py test_sync.py
+python3 -m compileall ai core modules main.py database.py seed_db.py test_sync.py
 uvicorn main:app --reload
 ```
 
@@ -546,6 +623,8 @@ RBAC changes are the main exception. If your module needs new permissions, edit 
 
 Shared frontend type changes are another exception. If your module needs a cross-module contract, edit `frontend/src/types/campus.ts`, but do not put module-only details there.
 
+Hub-owned surface changes are a separate exception. Use `frontend/src/modules/hub/` and `docs/hub_surfaces.md` for dashboard, personal calendar, and standalone assistant work.
+
 ## Module Checklist
 
 Before handing off a module:
@@ -556,7 +635,15 @@ Before handing off a module:
 4. Protected backend routes use `require_permission`.
 5. Frontend uses `ModuleWidgetProps`.
 6. CSS uses `theme.css` variables.
-7. `python3 -m compileall ai core modules main.py database.py test_agent.py test_sync.py` passes from `backend/`.
+7. `python3 -m compileall ai core modules main.py database.py seed_db.py test_sync.py` passes from `backend/`.
 8. `npm run typecheck` passes when dependencies are installed.
 9. No module-specific code was added to another module folder.
 10. The module can be disabled or ignored without breaking the hub.
+
+## Academic Module Notes
+
+Use `docs/academic_modules.md` for the current ERP, LMS, Exam Portal, Announcements, and shared timetable catalog contract.
+
+Key rule: reuse `course_id` from `backend/modules/academics/default_courses.json` and `frontend/src/modules/academics/defaultCourses.json`. Do not create module-local course identifiers for assignments, quizzes, announcements, or registrations.
+
+Use `docs/hub_surfaces.md` for Hub-owned Personal Calendar and AI Chat behavior.

@@ -288,7 +288,7 @@ npm run build
 
 ```bash
 cd backend
-python3 -m compileall ai core modules main.py database.py test_agent.py test_sync.py
+python3 -m compileall ai core modules main.py database.py seed_db.py test_sync.py
 ```
 
 Optional smoke checks should cover:

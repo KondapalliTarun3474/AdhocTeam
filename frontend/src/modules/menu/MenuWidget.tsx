@@ -74,8 +74,8 @@ function formatDate(value: string) {
   }).format(new Date(`${value}T00:00:00`))
 }
 
-function titleCase(value: string) {
-  return value.replace(/_/g, ' ').replace(/\b\w/g, (match) => match.toUpperCase())
+function titleCase(value?: string | null) {
+  return String(value ?? '').replace(/_/g, ' ').replace(/\b\w/g, (match) => match.toUpperCase())
 }
 
 function minutesToInputValue(minutes: number) {
@@ -346,14 +346,22 @@ function MenuWidget({
       rating: Number(ratingForm.rating),
       comment: ratingForm.comment,
     }
-    setStatus('Saving rating...')
-    const response = await submitMenuRating(rating, role, designations)
-    setWorkspace((current) => ({
-      ...current,
-      ratings: [...current.ratings, response.data ?? rating],
-    }))
-    setRatingForm((current) => ({ ...current, comment: '' }))
-    setStatus(response.status === 'preview' ? 'Rating previewed locally.' : 'Rating saved.')
+    try {
+      setStatus('Saving rating...')
+      const response = await submitMenuRating(rating, role, designations)
+      setWorkspace((current) => ({
+        ...current,
+        ratings: [...(current.ratings ?? []), response.data ?? rating],
+      }))
+      setRatingForm((current) => ({ ...current, comment: '' }))
+      setStatus(response.status === 'preview' ? 'Rating previewed locally.' : 'Rating saved.')
+    } catch (error) {
+      setWorkspace((current) => ({
+        ...current,
+        ratings: [...(current.ratings ?? []), rating],
+      }))
+      setStatus('Rating saved locally. The connected service returned an unexpected response.')
+    }
   }
 
   const handleSickMealSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -371,20 +379,24 @@ function MenuWidget({
       contact_number: sickMealForm.contactNumber,
       notes: sickMealForm.notes,
     }
-    setStatus('Submitting sick meal request...')
-    const response = await submitSickMeal(request, role, designations)
-    setWorkspace((current) => ({
-      ...current,
-      sick_meals: response.data ? [...current.sick_meals, response.data] : current.sick_meals,
-    }))
-    setSickMealForm((current) => ({
-      ...current,
-      reason: '',
-      deliveryLocation: '',
-      contactNumber: '',
-      notes: '',
-    }))
-    setStatus(response.status === 'preview' ? 'Sick meal previewed locally.' : 'Sick meal submitted.')
+    try {
+      setStatus('Submitting sick meal request...')
+      const response = await submitSickMeal(request, role, designations)
+      setWorkspace((current) => ({
+        ...current,
+        sick_meals: response.data ? [...(current.sick_meals ?? []), response.data] : current.sick_meals,
+      }))
+      setSickMealForm((current) => ({
+        ...current,
+        reason: '',
+        deliveryLocation: '',
+        contactNumber: '',
+        notes: '',
+      }))
+      setStatus(response.status === 'preview' ? 'Sick meal previewed locally.' : 'Sick meal submitted.')
+    } catch (error) {
+      setStatus('Could not submit the sick meal request. Please try again.')
+    }
   }
 
   const handleFeedbackSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -401,14 +413,18 @@ function MenuWidget({
       meal_type: feedbackForm.mealType,
       item_name: feedbackForm.itemName,
     }
-    setStatus('Sending feedback...')
-    const response = await submitMenuFeedback(request, role, designations)
-    setWorkspace((current) => ({
-      ...current,
-      feedback: response.data ? [...current.feedback, response.data] : current.feedback,
-    }))
-    setFeedbackForm((current) => ({ ...current, message: '' }))
-    setStatus(response.status === 'preview' ? 'Feedback previewed locally.' : 'Feedback sent.')
+    try {
+      setStatus('Sending feedback...')
+      const response = await submitMenuFeedback(request, role, designations)
+      setWorkspace((current) => ({
+        ...current,
+        feedback: response.data ? [...(current.feedback ?? []), response.data] : current.feedback,
+      }))
+      setFeedbackForm((current) => ({ ...current, message: '' }))
+      setStatus(response.status === 'preview' ? 'Feedback previewed locally.' : 'Feedback sent.')
+    } catch (error) {
+      setStatus('Could not send feedback. Please try again.')
+    }
   }
 
   const updateWeeklyMeal = (items: string[]) => {

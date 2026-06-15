@@ -6,6 +6,7 @@ import AssistantPanel from '../assistant/AssistantPanel'
 import { moduleManifestByKey, moduleManifests } from '../registry'
 import type { ComponentType } from 'react'
 import type { HubOverview, ModuleKey, ModuleWidgetProps } from '../../types/campus'
+import { getPersonalCalendar } from './hubCalendar'
 import './HubDashboard.css'
 
 interface ModuleWidgetEntry {
@@ -15,6 +16,7 @@ interface ModuleWidgetEntry {
 
 interface HubDashboardProps {
   activeProfile: DemoProfile
+  onOpenHubPage?: (pageKey: 'hub_calendar' | 'hub_assistant') => void
   onOpenModule: (moduleKey: ModuleKey) => void
   onProfileChange: (profileId: string) => void
   profileId: string
@@ -30,6 +32,7 @@ function formatDate(dateString: string) {
 
 function HubDashboard({
   activeProfile,
+  onOpenHubPage,
   onOpenModule,
   onProfileChange,
   profileId,
@@ -76,6 +79,7 @@ function HubDashboard({
   }, [overview])
 
   const dateLabel = overview?.date ? formatDate(overview.date) : ''
+  const personalCalendar = getPersonalCalendar(overview)
 
   return (
     <div className="hub-shell">
@@ -158,7 +162,40 @@ function HubDashboard({
             <div className="hub-panel-heading">
               <span className="hub-panel-mark">C</span>
               <h2>Calendar</h2>
+              <button
+                className="hub-panel-action"
+                onClick={() => onOpenHubPage?.('hub_calendar')}
+                type="button"
+              >
+                Open
+              </button>
             </div>
+            {personalCalendar && (
+              <div className="hub-personal-calendar">
+                <div className="hub-personal-heading">
+                  <span>Personal Calendar</span>
+                  <strong>{personalCalendar.day_name}</strong>
+                </div>
+                {personalCalendar.items.length > 0 ? (
+                  <div className="hub-personal-list">
+                    {personalCalendar.items.map((item) => (
+                      <article
+                        className={`hub-personal-row ${item.color_key} ${item.type === 'break' ? 'break' : ''}`}
+                        key={item.id}
+                      >
+                        <time>{item.start_label} - {item.end_label}</time>
+                        <div>
+                          <strong>{item.label}</strong>
+                          {item.course_name && <span>{item.course_name}</span>}
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="hub-personal-empty">No classes today.</p>
+                )}
+              </div>
+            )}
             <div className="hub-calendar">
               {(overview?.calendar ?? []).map((item) => (
                 <article className="hub-calendar-row" key={`${item.time}-${item.title}`}>
@@ -191,6 +228,7 @@ function HubDashboard({
           <AssistantPanel
             campusId={DEFAULT_CAMPUS_ID}
             designations={activeProfile.designations}
+            onOpenStandalone={() => onOpenHubPage?.('hub_assistant')}
             role={activeProfile.role}
             userId={DEFAULT_USER_ID}
           />
