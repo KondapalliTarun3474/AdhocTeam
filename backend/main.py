@@ -2,6 +2,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
+import os
+from dotenv import load_dotenv
+load_dotenv(override=True)
+
 from ai.agent import chat_with_agent
 from core.module_registry import discover_modules
 from core.router import router as rbac_router
