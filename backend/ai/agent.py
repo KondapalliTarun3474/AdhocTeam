@@ -41,7 +41,10 @@ def chat_with_agent(
     CampusBuddy LangChain Agent using Groq, dynamic tool discovery, and session memory.
     """
     if not os.environ.get("GROQ_API_KEY") or not ChatGroq:
-        return "The AI assistant is currently offline because LangChain/Groq is not configured."
+        import sys
+        key_status = "present" if os.environ.get("GROQ_API_KEY") else "MISSING"
+        chatgroq_status = "present" if ChatGroq else "MISSING"
+        return f"DEBUG -> Key: {key_status} | ChatGroq: {chatgroq_status} | Python: {sys.executable} | CWD: {os.getcwd()}"
 
     try:
         tools = _get_all_tools()
