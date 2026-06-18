@@ -1,0 +1,160 @@
+[32;1m[1;3m[chain/start][0m [1m[chain:RunnableWithMessageHistory] Entering Chain run with input:
+[0m{
+  "input": "i want to skip dinner and go to a movie tonight, will i miss anything?"
+}
+[32;1m[1;3m[chain/start][0m [1m[chain:RunnableWithMessageHistory > chain:insert_history] Entering Chain run with input:
+[0m{
+  "input": "i want to skip dinner and go to a movie tonight, will i miss anything?"
+}
+[32;1m[1;3m[chain/start][0m [1m[chain:RunnableWithMessageHistory > chain:insert_history > chain:RunnableParallel<chat_history>] Entering Chain run with input:
+[0m{
+  "input": "i want to skip dinner and go to a movie tonight, will i miss anything?"
+}
+[32;1m[1;3m[chain/start][0m [1m[chain:RunnableWithMessageHistory > chain:insert_history > chain:RunnableParallel<chat_history> > chain:load_history] Entering Chain run with input:
+[0m{
+  "input": "i want to skip dinner and go to a movie tonight, will i miss anything?"
+}
+[36;1m[1;3m[chain/end][0m [1m[chain:RunnableWithMessageHistory > chain:insert_history > chain:RunnableParallel<chat_history> > chain:load_history] [0ms] Exiting Chain run with output:
+[0m{
+  "output": []
+}
+[36;1m[1;3m[chain/end][0m [1m[chain:RunnableWithMessageHistory > chain:insert_history > chain:RunnableParallel<chat_history>] [1ms] Exiting Chain run with output:
+[0m{
+  "chat_history": []
+}
+[36;1m[1;3m[chain/end][0m [1m[chain:RunnableWithMessageHistory > chain:insert_history] [2ms] Exiting Chain run with output:
+[0m{
+  "input": "i want to skip dinner and go to a movie tonight, will i miss anything?",
+  "chat_history": []
+}
+[32;1m[1;3m[chain/start][0m [1m[chain:RunnableWithMessageHistory > chain:check_sync_or_async] Entering Chain run with input:
+[0m{
+  "input": "i want to skip dinner and go to a movie tonight, will i miss anything?",
+  "chat_history": []
+}
+[32;1m[1;3m[chain/start][0m [1m[chain:RunnableWithMessageHistory > chain:check_sync_or_async > chain:AgentExecutor] Entering Chain run with input:
+[0m{
+  "input": "i want to skip dinner and go to a movie tonight, will i miss anything?",
+  "chat_history": []
+}
+[32;1m[1;3m[chain/start][0m [1m[chain:RunnableWithMessageHistory > chain:check_sync_or_async > chain:AgentExecutor > chain:RunnableSequence] Entering Chain run with input:
+[0m{
+  "input": ""
+}
+[32;1m[1;3m[chain/start][0m [1m[chain:RunnableWithMessageHistory > chain:check_sync_or_async > chain:AgentExecutor > chain:RunnableSequence > chain:RunnableAssign<agent_scratchpad>] Entering Chain run with input:
+[0m{
+  "input": ""
+}
+[32;1m[1;3m[chain/start][0m [1m[chain:RunnableWithMessageHistory > chain:check_sync_or_async > chain:AgentExecutor > chain:RunnableSequence > chain:RunnableAssign<agent_scratchpad> > chain:RunnableParallel<agent_scratchpad>] Entering Chain run with input:
+[0m{
+  "input": ""
+}
+[32;1m[1;3m[chain/start][0m [1m[chain:RunnableWithMessageHistory > chain:check_sync_or_async > chain:AgentExecutor > chain:RunnableSequence > chain:RunnableAssign<agent_scratchpad> > chain:RunnableParallel<agent_scratchpad> > chain:RunnableLambda] Entering Chain run with input:
+[0m{
+  "input": ""
+}
+[36;1m[1;3m[chain/end][0m [1m[chain:RunnableWithMessageHistory > chain:check_sync_or_async > chain:AgentExecutor > chain:RunnableSequence > chain:RunnableAssign<agent_scratchpad> > chain:RunnableParallel<agent_scratchpad> > chain:RunnableLambda] [0ms] Exiting Chain run with output:
+[0m{
+  "output": []
+}
+[36;1m[1;3m[chain/end][0m [1m[chain:RunnableWithMessageHistory > chain:check_sync_or_async > chain:AgentExecutor > chain:RunnableSequence > chain:RunnableAssign<agent_scratchpad> > chain:RunnableParallel<agent_scratchpad>] [1ms] Exiting Chain run with output:
+[0m{
+  "agent_scratchpad": []
+}
+[36;1m[1;3m[chain/end][0m [1m[chain:RunnableWithMessageHistory > chain:check_sync_or_async > chain:AgentExecutor > chain:RunnableSequence > chain:RunnableAssign<agent_scratchpad>] [2ms] Exiting Chain run with output:
+[0m{
+  "input": "i want to skip dinner and go to a movie tonight, will i miss anything?",
+  "chat_history": [],
+  "intermediate_steps": [],
+  "agent_scratchpad": []
+}
+[32;1m[1;3m[chain/start][0m [1m[chain:RunnableWithMessageHistory > chain:check_sync_or_async > chain:AgentExecutor > chain:RunnableSequence > prompt:ChatPromptTemplate] Entering Prompt run with input:
+[0m{
+  "input": "i want to skip dinner and go to a movie tonight, will i miss anything?",
+  "chat_history": [],
+  "intermediate_steps": [],
+  "agent_scratchpad": []
+}
+[36;1m[1;3m[chain/end][0m [1m[chain:RunnableWithMessageHistory > chain:check_sync_or_async > chain:AgentExecutor > chain:RunnableSequence > prompt:ChatPromptTemplate] [1ms] Exiting Prompt run with output:
+[0m[outputs]
+[32;1m[1;3m[llm/start][0m [1m[chain:RunnableWithMessageHistory > chain:check_sync_or_async > chain:AgentExecutor > chain:RunnableSequence > llm:ChatGroq] Entering LLM run with input:
+[0m{
+  "prompts": [
+    "System: You are CampusBuddy, an intelligent, helpful AI assistant for university students.\nCurrent Date & Time: 2026-06-15T21:52:18.982718\nTomorrow's Date: 2026-06-16\nUser ID: demo-student\nUser Role: student\n\nYou have access to tools across campus modules: Food Menu, Room Bookings, Leave Applications, ERP course registration and personal academic calendar, LMS assignments, Exam Portal quizzes and scores, Announcements, and past ratings.\nUse these tools to gather information or perform actions on behalf of the user.\n\nCRITICAL RULES:\n1. CASUAL OUTINGS VS FORMAL LEAVES: A \"Formal Leave\" is for overnight stays or home visits. A \"Casual Outing\" is a quick errand (no leave application needed). Warn users with 4+ curfew violations to return by 10:30 PM.\n2. STRICT CONFIRMATION: You are strictly forbidden from calling `submit_campus_leave_application` or `submit_food_rating` without explicitly confirming the exact details with the user first. Always use `draft_campus_leave_application` first.\n3. ACADEMIC BOUNDARIES: For personal schedules/classes, use `get_personal_academic_calendar`. For global campus room availability, use `get_room_bookings_and_courses`. For deadlines, use `get_lms_assignments`.\n4. FILTERING: When checking past food ratings against today's menu, SILENTLY filter the ratings. Never mention an item if it's not on the menu today. Ensure exact item spelling.\n\nHuman: i want to skip dinner and go to a movie tonight, will i miss anything?"
+  ]
+}
+[31;1m[1;3m[llm/error][0m [1m[chain:RunnableWithMessageHistory > chain:check_sync_or_async > chain:AgentExecutor > chain:RunnableSequence > llm:ChatGroq] [945ms] LLM run errored with error:
+[0m"APIError(\"Failed to call a function. Please adjust your prompt. See 'failed_generation' for more details.\")Traceback (most recent call last):\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/language_models/chat_models.py\", line 391, in stream\n    for chunk in self._stream(messages, stop=stop, **kwargs):\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_groq/chat_models.py\", line 509, in _stream\n    for chunk in self.client.create(messages=message_dicts, **params):\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/groq/_streaming.py\", line 46, in __iter__\n    for item in self._iterator:\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/groq/_streaming.py\", line 91, in __stream__\n    raise APIError(\n\n\ngroq.APIError: Failed to call a function. Please adjust your prompt. See 'failed_generation' for more details."
+[31;1m[1;3m[chain/error][0m [1m[chain:RunnableWithMessageHistory > chain:check_sync_or_async > chain:AgentExecutor > chain:RunnableSequence] [951ms] Chain run errored with error:
+[0m"APIError(\"Failed to call a function. Please adjust your prompt. See 'failed_generation' for more details.\")Traceback (most recent call last):\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py\", line 2056, in _transform_stream_with_config\n    chunk: Output = context.run(next, iterator)  # type: ignore\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py\", line 3212, in _transform\n    yield from final_pipeline\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py\", line 1272, in transform\n    for ichunk in input:\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py\", line 5300, in transform\n    yield from self.bound.transform(\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py\", line 1290, in transform\n    yield from self.stream(final, config, **kwargs)\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/language_models/chat_models.py\", line 411, in stream\n    raise e\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/language_models/chat_models.py\", line 391, in stream\n    for chunk in self._stream(messages, stop=stop, **kwargs):\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_groq/chat_models.py\", line 509, in _stream\n    for chunk in self.client.create(messages=message_dicts, **params):\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/groq/_streaming.py\", line 46, in __iter__\n    for item in self._iterator:\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/groq/_streaming.py\", line 91, in __stream__\n    raise APIError(\n\n\ngroq.APIError: Failed to call a function. Please adjust your prompt. See 'failed_generation' for more details."
+[31;1m[1;3m[chain/error][0m [1m[chain:RunnableWithMessageHistory > chain:check_sync_or_async > chain:AgentExecutor] [953ms] Chain run errored with error:
+[0m"APIError(\"Failed to call a function. Please adjust your prompt. See 'failed_generation' for more details.\")Traceback (most recent call last):\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain/chains/base.py\", line 153, in invoke\n    self._call(inputs, run_manager=run_manager)\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain/agents/agent.py\", line 1625, in _call\n    next_step_output = self._take_next_step(\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain/agents/agent.py\", line 1331, in _take_next_step\n    [\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain/agents/agent.py\", line 1331, in <listcomp>\n    [\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain/agents/agent.py\", line 1359, in _iter_next_step\n    output = self._action_agent.plan(\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain/agents/agent.py\", line 577, in plan\n    for chunk in self.runnable.stream(inputs, config={\"callbacks\": callbacks}):\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py\", line 3262, in stream\n    yield from self.transform(iter([input]), config, **kwargs)\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py\", line 3249, in transform\n    yield from self._transform_stream_with_config(\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py\", line 2056, in _transform_stream_with_config\n    chunk: Output = context.run(next, iterator)  # type: ignore\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py\", line 3212, in _transform\n    yield from final_pipeline\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py\", line 1272, in transform\n    for ichunk in input:\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py\", line 5300, in transform\n    yield from self.bound.transform(\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py\", line 1290, in transform\n    yield from self.stream(final, config, **kwargs)\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/language_models/chat_models.py\", line 411, in stream\n    raise e\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/language_models/chat_models.py\", line 391, in stream\n    for chunk in self._stream(messages, stop=stop, **kwargs):\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_groq/chat_models.py\", line 509, in _stream\n    for chunk in self.client.create(messages=message_dicts, **params):\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/groq/_streaming.py\", line 46, in __iter__\n    for item in self._iterator:\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/groq/_streaming.py\", line 91, in __stream__\n    raise APIError(\n\n\ngroq.APIError: Failed to call a function. Please adjust your prompt. See 'failed_generation' for more details."
+[31;1m[1;3m[chain/error][0m [1m[chain:RunnableWithMessageHistory > chain:check_sync_or_async] [954ms] Chain run errored with error:
+[0m"APIError(\"Failed to call a function. Please adjust your prompt. See 'failed_generation' for more details.\")Traceback (most recent call last):\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py\", line 1786, in _call_with_config\n    context.run(\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/config.py\", line 398, in call_func_with_variable_args\n    return func(input, **kwargs)  # type: ignore[call-arg]\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py\", line 4341, in _invoke\n    output = output.invoke(\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py\", line 5093, in invoke\n    return self.bound.invoke(\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain/chains/base.py\", line 163, in invoke\n    raise e\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain/chains/base.py\", line 153, in invoke\n    self._call(inputs, run_manager=run_manager)\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain/agents/agent.py\", line 1625, in _call\n    next_step_output = self._take_next_step(\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain/agents/agent.py\", line 1331, in _take_next_step\n    [\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain/agents/agent.py\", line 1331, in <listcomp>\n    [\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain/agents/agent.py\", line 1359, in _iter_next_step\n    output = self._action_agent.plan(\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain/agents/agent.py\", line 577, in plan\n    for chunk in self.runnable.stream(inputs, config={\"callbacks\": callbacks}):\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py\", line 3262, in stream\n    yield from self.transform(iter([input]), config, **kwargs)\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py\", line 3249, in transform\n    yield from self._transform_stream_with_config(\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py\", line 2056, in _transform_stream_with_config\n    chunk: Output = context.run(next, iterator)  # type: ignore\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py\", line 3212, in _transform\n    yield from final_pipeline\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py\", line 1272, in transform\n    for ichunk in input:\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py\", line 5300, in transform\n    yield from self.bound.transform(\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py\", line 1290, in transform\n    yield from self.stream(final, config, **kwargs)\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/language_models/chat_models.py\", line 411, in stream\n    raise e\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/language_models/chat_models.py\", line 391, in stream\n    for chunk in self._stream(messages, stop=stop, **kwargs):\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_groq/chat_models.py\", line 509, in _stream\n    for chunk in self.client.create(messages=message_dicts, **params):\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/groq/_streaming.py\", line 46, in __iter__\n    for item in self._iterator:\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/groq/_streaming.py\", line 91, in __stream__\n    raise APIError(\n\n\ngroq.APIError: Failed to call a function. Please adjust your prompt. See 'failed_generation' for more details."
+Traceback (most recent call last):
+  File "/home/tarun-3474/AH/backend/ai/agent.py", line 88, in chat_with_agent
+    result = agent_with_chat_history.invoke(
+  File "/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py", line 5093, in invoke
+    return self.bound.invoke(
+  File "/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py", line 5093, in invoke
+    return self.bound.invoke(
+  File "/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py", line 2879, in invoke
+    input = context.run(step.invoke, input, config)
+  File "/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py", line 5093, in invoke
+    return self.bound.invoke(
+  File "/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py", line 4475, in invoke
+    return self._call_with_config(
+  File "/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py", line 1786, in _call_with_config
+    context.run(
+  File "/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/config.py", line 398, in call_func_with_variable_args
+    return func(input, **kwargs)  # type: ignore[call-arg]
+  File "/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py", line 4341, in _invoke
+    output = output.invoke(
+  File "/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py", line 5093, in invoke
+    return self.bound.invoke(
+  File "/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain/chains/base.py", line 163, in invoke
+    raise e
+  File "/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain/chains/base.py", line 153, in invoke
+    self._call(inputs, run_manager=run_manager)
+  File "/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain/agents/agent.py", line 1625, in _call
+    next_step_output = self._take_next_step(
+  File "/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain/agents/agent.py", line 1331, in _take_next_step
+    [
+  File "/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain/agents/agent.py", line 1331, in <listcomp>
+    [
+  File "/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain/agents/agent.py", line 1359, in _iter_next_step
+    output = self._action_agent.plan(
+  File "/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain/agents/agent.py", line 577, in plan
+    for chunk in self.runnable.stream(inputs, config={"callbacks": callbacks}):
+  File "/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py", line 3262, in stream
+    yield from self.transform(iter([input]), config, **kwargs)
+  File "/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py", line 3249, in transform
+    yield from self._transform_stream_with_config(
+  File "/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py", line 2056, in _transform_stream_with_config
+    chunk: Output = context.run(next, iterator)  # type: ignore
+  File "/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py", line 3212, in _transform
+    yield from final_pipeline
+  File "/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py", line 1272, in transform
+    for ichunk in input:
+  File "/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py", line 5300, in transform
+    yield from self.bound.transform(
+  File "/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py", line 1290, in transform
+    yield from self.stream(final, config, **kwargs)
+  File "/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/language_models/chat_models.py", line 411, in stream
+    raise e
+  File "/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/language_models/chat_models.py", line 391, in stream
+    for chunk in self._stream(messages, stop=stop, **kwargs):
+  File "/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_groq/chat_models.py", line 509, in _stream
+    for chunk in self.client.create(messages=message_dicts, **params):
+  File "/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/groq/_streaming.py", line 46, in __iter__
+    for item in self._iterator:
+  File "/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/groq/_streaming.py", line 91, in __stream__
+    raise APIError(
+groq.APIError: Failed to call a function. Please adjust your prompt. See 'failed_generation' for more details.
+[31;1m[1;3m[chain/error][0m [1m[chain:RunnableWithMessageHistory] [956ms] Chain run errored with error:
+[0m"APIError(\"Failed to call a function. Please adjust your prompt. See 'failed_generation' for more details.\")Traceback (most recent call last):\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py\", line 2879, in invoke\n    input = context.run(step.invoke, input, config)\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py\", line 5093, in invoke\n    return self.bound.invoke(\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py\", line 4475, in invoke\n    return self._call_with_config(\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py\", line 1786, in _call_with_config\n    context.run(\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/config.py\", line 398, in call_func_with_variable_args\n    return func(input, **kwargs)  # type: ignore[call-arg]\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py\", line 4341, in _invoke\n    output = output.invoke(\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py\", line 5093, in invoke\n    return self.bound.invoke(\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain/chains/base.py\", line 163, in invoke\n    raise e\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain/chains/base.py\", line 153, in invoke\n    self._call(inputs, run_manager=run_manager)\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain/agents/agent.py\", line 1625, in _call\n    next_step_output = self._take_next_step(\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain/agents/agent.py\", line 1331, in _take_next_step\n    [\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain/agents/agent.py\", line 1331, in <listcomp>\n    [\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain/agents/agent.py\", line 1359, in _iter_next_step\n    output = self._action_agent.plan(\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain/agents/agent.py\", line 577, in plan\n    for chunk in self.runnable.stream(inputs, config={\"callbacks\": callbacks}):\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py\", line 3262, in stream\n    yield from self.transform(iter([input]), config, **kwargs)\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py\", line 3249, in transform\n    yield from self._transform_stream_with_config(\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py\", line 2056, in _transform_stream_with_config\n    chunk: Output = context.run(next, iterator)  # type: ignore\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py\", line 3212, in _transform\n    yield from final_pipeline\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py\", line 1272, in transform\n    for ichunk in input:\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py\", line 5300, in transform\n    yield from self.bound.transform(\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/runnables/base.py\", line 1290, in transform\n    yield from self.stream(final, config, **kwargs)\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/language_models/chat_models.py\", line 411, in stream\n    raise e\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_core/language_models/chat_models.py\", line 391, in stream\n    for chunk in self._stream(messages, stop=stop, **kwargs):\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/langchain_groq/chat_models.py\", line 509, in _stream\n    for chunk in self.client.create(messages=message_dicts, **params):\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/groq/_streaming.py\", line 46, in __iter__\n    for item in self._iterator:\n\n\n  File \"/home/tarun-3474/AH/backend/venv/lib/python3.8/site-packages/groq/_streaming.py\", line 91, in __stream__\n    raise APIError(\n\n\ngroq.APIError: Failed to call a function. Please adjust your prompt. See 'failed_generation' for more details."
+AGENT RESPONSE:
+ Error connecting to CampusBuddy AI: Failed to call a function. Please adjust your prompt. See 'failed_generation' for more details. 
+
+Detailed Generation Error:
+No failed generation detail

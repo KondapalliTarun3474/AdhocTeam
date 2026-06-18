@@ -7,13 +7,13 @@ from modules.announcements.service import get_workspace
 
 
 @tool
-def get_campus_announcements(category: Optional[str] = None, tag: Optional[str] = None) -> str:
-    """Get campus announcements and inbox items, optionally filtered by category or tag.
-    Use this for course announcements, hackathons, volunteering, events, placement opportunities,
-    resources, assignment notices, quiz notices, and result releases.
+def get_campus_announcements(user_id: str = "") -> str:
+    """Get all recent campus announcements and inbox items.
+    Data Returned (JSON): announcements (array of title, body, category, tag, priority, course_name).
+    Use Cases: Use this when the user asks "what's happening on campus?", "are there any hackathons?", or asks for specific types of announcements like placements. Filter the returned list yourself based on the user's request.
     """
     try:
-        return get_workspace(DEFAULT_CAMPUS_ID, category=category, tag=tag).json()
+        return get_workspace(DEFAULT_CAMPUS_ID).json()
     except Exception as error:
         return f"Error fetching announcements: {error}"
 

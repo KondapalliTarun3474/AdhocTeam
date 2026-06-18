@@ -1,7 +1,7 @@
 import json
 from datetime import date, datetime, time, timedelta
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Sequence
+from typing import Dict, Iterable, List, Optional, Sequence, Tuple
 
 from modules.academics.schemas import (
     AcademicCourse,
@@ -130,7 +130,7 @@ def _week_start(value: Optional[str] = None) -> date:
     return selected - timedelta(days=selected.weekday())
 
 
-def session_datetimes(session: CourseSession, week_start: Optional[str] = None) -> tuple[str, str]:
+def session_datetimes(session: CourseSession, week_start: Optional[str] = None) -> Tuple[str, str]:
     start_date = _week_start(week_start) + timedelta(days=session.day_index)
     start_hours, start_minutes = [int(part) for part in session.start_time.split(":")]
     end_hours, end_minutes = [int(part) for part in session.end_time.split(":")]

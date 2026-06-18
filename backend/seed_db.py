@@ -25,7 +25,7 @@ def seed():
     except Exception as e:
         print(f"❌ Failed to seed menu: {e}")
 
-    print("Seeding Campus Rooms...")
+    print("Seeding Campus Rooms & Courses...")
     try:
         rooms = _seed_rooms(DEFAULT_CAMPUS_ID)
         for room in rooms:
@@ -35,12 +35,17 @@ def seed():
         for course in courses:
             supabase.table("campus_courses").upsert(course.dict(), on_conflict="campus_id,course_id").execute()
 
+        from modules.academics.service import list_sessions
+        sessions = list_sessions(DEFAULT_CAMPUS_ID)
+        for session in sessions:
+            supabase.table("campus_course_sessions").upsert(session.dict(), on_conflict="campus_id,session_id").execute()
+
         bookings = _seed_bookings(DEFAULT_CAMPUS_ID)
         for booking in bookings:
-            supabase.table("campus_room_bookings").insert(booking.dict()).execute()
-        print("✅ Campus Rooms seeded.")
+            supabase.table("campus_room_bookings").upsert(booking.dict(), on_conflict="id").execute()
+        print("✅ Campus Rooms & Courses seeded.")
     except Exception as e:
-        print(f"❌ Failed to seed campus rooms: {e}")
+        print(f"❌ Failed to seed campus rooms & courses: {e}")
 
     print("Seeding Campus Leave...")
     try:
